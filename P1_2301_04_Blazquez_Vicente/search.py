@@ -72,23 +72,7 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
-def depthFirstSearch(problem):
-    """
-    Search the deepest nodes in the search tree first.
-
-    Your search algorithm needs to return a list of actions that reaches the
-    goal. Make sure to implement a graph search algorithm.
-
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
-
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    """
-    "*** YOUR CODE HERE ***"
-    # Inicializamos la lista de abiertos como una cola LIFO para la busqueda en profundidad
-    listaAbiertos=util.Stack()
+def generalSearch(problem, listaAbiertos):
     listaAbiertos.push((problem.getStartState(),[]))
     listaCerrados=[]
 
@@ -106,15 +90,71 @@ def depthFirstSearch(problem):
                 lista.append(successor[1])
                 listaAbiertos.push((successor[0],lista))
 
+def depthFirstSearch(problem):
+    """
+    Search the deepest nodes in the search tree first.
+
+    Your search algorithm needs to return a list of actions that reaches the
+    goal. Make sure to implement a graph search algorithm.
+
+    To get started, you might want to try some of these simple commands to
+    understand the search problem that is being passed in:
+
+    print("Start:", problem.getStartState())
+    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+    """
+    "*** YOUR CODE HERE ***"
+    # Inicializamos la lista de abiertos como una cola LIFO para la busqueda en profundidad
+    listaAbiertos=util.PriorityQueueWithFunction(lambda item: len(item[1]))
+    return generalSearch(problem,listaAbiertos)
+
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # Inicializamos la lista de abiertos como una cola FIFO para la busqueda en profundidad
+    listaAbiertos=util.PriorityQueueWithFunction(lambda item: len(item[1]))
+    return generalSearch(problem,listaAbiertos)
+
+'''def recursiva(listaAbiertos, listaCerrados, problem, priority):
+    if listaAbiertos.isEmpty(): return []
+    nodo=listaAbiertos.pop()
+    if(problem.isGoalState(nodo[0])):
+        return nodo[1]
+    # Mantenemos una lista de los nodos ya explorados para no repetirlos        
+    if nodo[0] not in listaCerrados:
+        listaCerrados.append(nodo[0])
+        # Añadimos los sucesores para explorarlos en el orden dado por la funcion getSuccessors
+        for successor in problem.getSuccessors(nodo[0]):
+            lista=nodo[1].copy()
+            lista.append(successor[1])
+            listaAbiertos.push((successor[0],lista),priority+successor[2])
+            return recursiva(listaAbiertos, listaCerrados, problem,priority)
+    return []'''
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    listaAbiertos=util.PriorityQueueWithFunction()
+    priority=0
+    listaAbiertos.push((problem.getStartState(),[],priority),priority)
+    listaCerrados=[]
+
+    #return recursiva(listaAbiertos, listaCerrados, problem, priority)
+
+    while(True):
+        if listaAbiertos.isEmpty(): return []
+        nodo=listaAbiertos.pop()
+        if(problem.isGoalState(nodo[0])):
+            return nodo[1]
+        # Mantenemos una lista de los nodos ya explorados para no repetirlos        
+        if nodo[0] not in listaCerrados:
+            listaCerrados.append(nodo[0])
+            # Añadimos los sucesores para explorarlos en el orden dado por la funcion getSuccessors
+            for successor in problem.getSuccessors(nodo[0]):
+                lista=nodo[1].copy()
+                lista.append(successor[1])
+                listaAbiertos.push((successor[0],lista,nodo[2]+successor[2]),nodo[2]+successor[2])
 
 def nullHeuristic(state, problem=None):
     """
