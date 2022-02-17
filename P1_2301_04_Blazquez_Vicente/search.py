@@ -73,7 +73,7 @@ def tinyMazeSearch(problem):
     return  [s, s, w, s, w, w, s, w]
 
 def generalSearch(problem, listaAbiertos):
-    listaAbiertos.push((problem.getStartState(),[]))
+    listaAbiertos.push((problem.getStartState(),[],0))
     listaCerrados=[]
 
     while(True):
@@ -88,7 +88,7 @@ def generalSearch(problem, listaAbiertos):
             for successor in problem.getSuccessors(nodo[0]):
                 lista=nodo[1].copy()
                 lista.append(successor[1])
-                listaAbiertos.push((successor[0],lista))
+                listaAbiertos.push((successor[0],lista,nodo[2]+successor[2]))
 
 def depthFirstSearch(problem):
     """
@@ -106,55 +106,23 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
     # Inicializamos la lista de abiertos como una cola LIFO para la busqueda en profundidad
-    listaAbiertos=util.PriorityQueueWithFunction(lambda item: len(item[1]))
+    listaAbiertos=util.Stack()
     return generalSearch(problem,listaAbiertos)
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
     # Inicializamos la lista de abiertos como una cola FIFO para la busqueda en profundidad
-    listaAbiertos=util.PriorityQueueWithFunction(lambda item: len(item[1]))
+    listaAbiertos=util.Queue()
     return generalSearch(problem,listaAbiertos)
-
-'''def recursiva(listaAbiertos, listaCerrados, problem, priority):
-    if listaAbiertos.isEmpty(): return []
-    nodo=listaAbiertos.pop()
-    if(problem.isGoalState(nodo[0])):
-        return nodo[1]
-    # Mantenemos una lista de los nodos ya explorados para no repetirlos        
-    if nodo[0] not in listaCerrados:
-        listaCerrados.append(nodo[0])
-        # Añadimos los sucesores para explorarlos en el orden dado por la funcion getSuccessors
-        for successor in problem.getSuccessors(nodo[0]):
-            lista=nodo[1].copy()
-            lista.append(successor[1])
-            listaAbiertos.push((successor[0],lista),priority+successor[2])
-            return recursiva(listaAbiertos, listaCerrados, problem,priority)
-    return []'''
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    listaAbiertos=util.PriorityQueueWithFunction()
-    priority=0
-    listaAbiertos.push((problem.getStartState(),[],priority),priority)
+    listaAbiertos=util.PriorityQueueWithFunction(lambda item: item[2])
     listaCerrados=[]
 
-    #return recursiva(listaAbiertos, listaCerrados, problem, priority)
-
-    while(True):
-        if listaAbiertos.isEmpty(): return []
-        nodo=listaAbiertos.pop()
-        if(problem.isGoalState(nodo[0])):
-            return nodo[1]
-        # Mantenemos una lista de los nodos ya explorados para no repetirlos        
-        if nodo[0] not in listaCerrados:
-            listaCerrados.append(nodo[0])
-            # Añadimos los sucesores para explorarlos en el orden dado por la funcion getSuccessors
-            for successor in problem.getSuccessors(nodo[0]):
-                lista=nodo[1].copy()
-                lista.append(successor[1])
-                listaAbiertos.push((successor[0],lista,nodo[2]+successor[2]),nodo[2]+successor[2])
+    return generalSearch(problem,listaAbiertos)
 
 def nullHeuristic(state, problem=None):
     """
@@ -166,7 +134,10 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    listaAbiertos=util.PriorityQueueWithFunction(lambda item: item[2]+heuristic(item[0],problem))
+    listaCerrados=[]
+
+    return generalSearch(problem,listaAbiertos)
 
 
 # Abbreviations
