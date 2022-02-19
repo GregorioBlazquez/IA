@@ -80,6 +80,7 @@ def generalSearch(problem, listaAbiertos):
         if listaAbiertos.isEmpty(): return []
         nodo=listaAbiertos.pop()
         if(problem.isGoalState(nodo[0])):
+            print(nodo[1])
             return nodo[1]
         # Mantenemos una lista de los nodos ya explorados para no repetirlos        
         if nodo[0] not in listaCerrados:
@@ -120,7 +121,6 @@ def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
     listaAbiertos=util.PriorityQueueWithFunction(lambda item: item[2])
-    listaCerrados=[]
 
     return generalSearch(problem,listaAbiertos)
 
@@ -135,7 +135,6 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
     listaAbiertos=util.PriorityQueueWithFunction(lambda item: item[2]+heuristic(item[0],problem))
-    listaCerrados=[]
 
     return generalSearch(problem,listaAbiertos)
 
