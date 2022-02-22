@@ -288,7 +288,6 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
-        self.cornersVisited=[]
 
     def getStartState(self):
         """
@@ -296,7 +295,7 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        return (self.startingPosition,self.cornersVisited)
+        return (self.startingPosition,set())
     
     def isGoalState(self, state):
         """
@@ -304,11 +303,11 @@ class CornersProblem(search.SearchProblem):
         """
         "*** YOUR CODE HERE ***"
         if state[0] in self.corners:
-            print("Alcanzado la esquina: "+str(state[0]))
-            if state[0] not in self.cornersVisited:
-                self.cornersVisited.append(state[0])
-                print("Lista de esquinas visitadas: "+str(self.cornersVisited))
-            if len(self.cornersVisited) == 4:
+            #print("Encontrada esquina: "+str(state[0]))
+            if state[0] not in state[1]:
+                state[1].add(state[0])
+                #print("Esquinas visitadas: "+str(state[1]))
+            if len(state[1]) == 4:
                 return True
 
     def getSuccessors(self, state):
@@ -336,7 +335,8 @@ class CornersProblem(search.SearchProblem):
             nextx, nexty = int(x + dx), int(y + dy)
             if not self.walls[nextx][nexty]:
                 nextState = (nextx, nexty)
-                successors.append( ( (nextState,self.cornersVisited), action, 1) )
+                conjuntoEsquinas=state[1].copy()
+                successors.append( ( (nextState,conjuntoEsquinas), action, 1) )
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -372,18 +372,30 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
+    if (set(corners)-state[1])==set():
+        return 0
+
     # Calculamos el minimo de las distancias de manhattan a las esquinas
     minManhattan=-1
-    for pos in self.corners:
-        if pos not in self.cornersVisited:
+    for pos in corners:
+        if pos not in state[1]:
             aux=abs(state[0][0] - pos[0]) + abs(state[0][1] - pos[1])
             if (minManhattan==-1) or (aux<minManhattan):
                 minManhattan=aux
     
-    n=len(self.corners)-len(self.cornersVisited)-1
+    n=len(corners)-len(state[1])-1
 
-    height=abs(self.corners[0][1]-self.corners[1][1])
-    width=abs(self.corners[0][0]-self.corners[2][0])
+    '''minEsquinas=-1
+    for corner in corners:
+        if corner not in state[1]:
+            aux=disManhattan(state[0],corner)
+        if (aux<=minEsquinas) and (aux!=-1):
+            minEsquinas=aux'''
+
+
+    height=abs(corners[0][1]-corners[1][1])
+    width=abs(corners[0][0]-corners[2][0])
+
     if height<width:
         return minManhattan+n*height
     

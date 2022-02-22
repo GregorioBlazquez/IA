@@ -80,7 +80,7 @@ def generalSearch(problem, listaAbiertos):
         if listaAbiertos.isEmpty(): return []
         nodo=listaAbiertos.pop()
         if(problem.isGoalState(nodo[0])):
-            print(nodo[1])
+            #print(nodo[1])
             return nodo[1]
         # Mantenemos una lista de los nodos ya explorados para no repetirlos        
         if nodo[0] not in listaCerrados:
@@ -90,6 +90,7 @@ def generalSearch(problem, listaAbiertos):
                 lista=nodo[1].copy()
                 lista.append(successor[1])
                 listaAbiertos.push((successor[0],lista,nodo[2]+successor[2]))
+        #print("ITERACION    "+str(listaCerrados)+"   "+str(nodo))
 
 def depthFirstSearch(problem):
     """
