@@ -353,20 +353,22 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-
+    print(str(state))
     #print("Número de esquinas encontradas: "+str(len(state[1])))
 
     # Calculamos el minimo de las distancias de manhattan a las esquinas
-    minManhattan=100000
+    minManhattan=-1
     for pos in corners:
+        print("Esquina")
         if pos not in state[1]:
             aux=disManhattan(state[0],pos)
-            if aux<minManhattan:
+            print(aux)
+            if (aux<minManhattan) or (minManhattan==-1):
                 minManhattan=aux
     #print(minManhattan)
-    '''if(minManhattan==-1):
+    if(minManhattan==-1):
         print("Hola buenas\n")
-        minManhattan=0'''
+        minManhattan=0
 
     height=abs(corners[0][1]-corners[1][1])
     width=abs(corners[0][0]-corners[2][0])

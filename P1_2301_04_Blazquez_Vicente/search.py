@@ -76,6 +76,8 @@ def generalSearch(problem, listaAbiertos):
     listaAbiertos.push((problem.getStartState(),[],0))
     listaCerrados=[]
 
+    print("Ejecutando generalSearch")
+
     while(True):
         if listaAbiertos.isEmpty(): return []
         nodo=listaAbiertos.pop()
