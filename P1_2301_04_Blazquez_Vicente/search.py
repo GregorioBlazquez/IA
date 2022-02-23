@@ -84,13 +84,14 @@ def generalSearch(problem, listaAbiertos):
             return nodo[1]
         # Mantenemos una lista de los nodos ya explorados para no repetirlos        
         if nodo[0] not in listaCerrados:
+            #print("Expansión: "+str(nodo[2]))
             listaCerrados.append(nodo[0])
             # Añadimos los sucesores para explorarlos en el orden dado por la funcion getSuccessors
             for successor in problem.getSuccessors(nodo[0]):
                 lista=nodo[1].copy()
                 lista.append(successor[1])
                 listaAbiertos.push((successor[0],lista,nodo[2]+successor[2]))
-        #print("ITERACION    "+str(listaCerrados)+"   "+str(nodo))
+        #print("ITERACION   "+str(nodo))
 
 def depthFirstSearch(problem):
     """

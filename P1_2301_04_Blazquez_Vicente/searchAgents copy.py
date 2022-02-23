@@ -17,14 +17,20 @@ This file contains all of the agents that can be selected to control Pacman.  To
 select an agent, use the '-p' option when running pacman.py.  Arguments can be
 passed to your agent using '-a'.  For example, to load a SearchAgent that uses
 depth first search (dfs), run the following command:
+
 > python pacman.py -p SearchAgent -a fn=depthFirstSearch
+
 Commands to invoke other search strategies can be found in the project
 description.
+
 Please only change the parts of the file you are asked to.  Look for the lines
 that say
+
 "*** YOUR CODE HERE ***"
+
 The parts you fill in start about 3/4 of the way down.  Follow the project
 description for details.
+
 Good luck and happy searching!
 """
 
@@ -34,7 +40,6 @@ from game import Actions
 import util
 import time
 import search
-
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -56,11 +61,15 @@ class SearchAgent(Agent):
     This very general search agent finds a path using a supplied search
     algorithm for a supplied search problem, then returns actions to follow that
     path.
+
     As a default, this agent runs DFS on a PositionSearchProblem to find
     location (1,1)
+
     Options for fn include:
       depthFirstSearch or dfs
       breadthFirstSearch or bfs
+
+
     Note: You should NOT change any code in SearchAgent
     """
 
@@ -97,6 +106,7 @@ class SearchAgent(Agent):
         board. Here, we choose a path to the goal. In this phase, the agent
         should compute the path to the goal and store it in a local variable.
         All of the work is done in this method!
+
         state: a GameState object (pacman.py)
         """
         if self.searchFunction == None: raise Exception("No search function provided for SearchAgent")
@@ -112,6 +122,7 @@ class SearchAgent(Agent):
         Returns the next action in the path chosen earlier (in
         registerInitialState).  Return Directions.STOP if there is no further
         action to take.
+
         state: a GameState object (pacman.py)
         """
         if 'actionIndex' not in dir(self): self.actionIndex = 0
@@ -127,13 +138,16 @@ class PositionSearchProblem(search.SearchProblem):
     A search problem defines the state space, start state, goal test, successor
     function and cost function.  This search problem can be used to find paths
     to a particular point on the pacman board.
+
     The state space consists of (x,y) positions in a pacman game.
+
     Note: this search problem is fully specified; you should NOT change it.
     """
 
     def __init__(self, gameState, costFn = lambda x: 1, goal=(1,1), start=None, warn=True, visualize=True):
         """
         Stores the start and goal.
+
         gameState: A GameState object (pacman.py)
         costFn: A function from a search state (tuple) to a non-negative number
         goal: A position in the gameState
@@ -169,6 +183,7 @@ class PositionSearchProblem(search.SearchProblem):
     def getSuccessors(self, state):
         """
         Returns successor states, the actions they require, and a cost of 1.
+
          As noted in search.py:
              For a given state, this should return a list of triples,
          (successor, action, stepCost), where 'successor' is a
@@ -215,6 +230,7 @@ class StayEastSearchAgent(SearchAgent):
     """
     An agent for position search with a cost function that penalizes being in
     positions on the West side of the board.
+
     The cost function for stepping into a position (x,y) is 1/2^x.
     """
     def __init__(self):
@@ -226,6 +242,7 @@ class StayWestSearchAgent(SearchAgent):
     """
     An agent for position search with a cost function that penalizes being in
     positions on the East side of the board.
+
     The cost function for stepping into a position (x,y) is 2^x.
     """
     def __init__(self):
@@ -252,6 +269,7 @@ def euclideanHeuristic(position, problem, info={}):
 class CornersProblem(search.SearchProblem):
     """
     This search problem finds paths through all four corners of a layout.
+
     You must select a suitable state space and successor function
     """
 
@@ -284,18 +302,22 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        print("Ejecuto isGoalState")
         if state[0] in self.corners:
-            print("Encontrada esquina: "+str(state[0]))
+            #print("Encontrada esquina: "+str(state[0]))
             if state[0] not in state[1]:
                 state[1].add(state[0])
-                #print("Esquinas visitadas: "+str(state[1]))
+                #print("Esquinas encontradas: "+str(state[1]))
             if len(state[1]) == 4:
+                print("isGoalState TRUE")
                 return True
+
+
+        return False
 
     def getSuccessors(self, state):
         """
         Returns successor states, the actions they require, and a cost of 1.
+
          As noted in search.py:
             For a given state, this should return a list of triples, (successor,
             action, stepCost), where 'successor' is a successor to the current
@@ -339,12 +361,16 @@ class CornersProblem(search.SearchProblem):
 def disManhattan(a,b):
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
+
 def cornersHeuristic(state, problem):
     """
     A heuristic for the CornersProblem that you defined.
+
       state:   The current search state
                (a data structure you chose in your search problem)
+
       problem: The CornersProblem instance for this layout.
+
     This function should always return a number that is a lower bound on the
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
@@ -357,24 +383,26 @@ def cornersHeuristic(state, problem):
     #print("Número de esquinas encontradas: "+str(len(state[1])))
 
     # Calculamos el minimo de las distancias de manhattan a las esquinas
-    minManhattan=100000
+    minManhattan=0
     for pos in corners:
         if pos not in state[1]:
             aux=disManhattan(state[0],pos)
-            if aux<minManhattan:
+            if (minManhattan==0) or (aux<minManhattan):
                 minManhattan=aux
-    #print(minManhattan)
-    '''if(minManhattan==-1):
-        print("Hola buenas\n")
-        minManhattan=0'''
+    
+    #n=len(corners)-len(state[1])-1
 
-    height=abs(corners[0][1]-corners[1][1])
-    width=abs(corners[0][0]-corners[2][0])
+    height=disManhattan(corners[0],corners[1])
+    width=disManhattan(corners[0],corners[2])
 
+    # ((1,1), (1,top), (right, 1), (right, top))
+    # h(x) <= coste(x->x') + h(x')
+    # h(x) = minManhattan(n) + n*min(height,width)
+    # coste(x->x')
+    # h(x') = minManhattan(x') + n*min(height,width)
+    # Si x no esta al lado de una esquina minManhattan(x)<=minManhattan(x')+1 y minManhattan(x)>=minManhattan(x')-1
     lados=[height,width]
     NesquinasEncontradas = len(state[1])
-
-    print("Número de esquinas encontradas: "+str(NesquinasEncontradas))
 
     if NesquinasEncontradas == 0:
         #print(minManhattan+2*min(lados)+max(lados))
@@ -384,12 +412,17 @@ def cornersHeuristic(state, problem):
         return minManhattan+lados[0]+lados[1]
     elif NesquinasEncontradas == 2:
         esquinas = [x for x in corners if x not in state[1]] #list(set(corners)-state[1])
-        #print(minManhattan+disManhattan(esquinas[0],esquinas[1]))
         return minManhattan+disManhattan(esquinas[0],esquinas[1])
     else:
         #print(minManhattan)
         return minManhattan
 
+
+    ''' | 0 |   |   |
+        |   |   |
+        |   |   |
+        |   |   |
+        | x |   |      '''
     
 
 
@@ -403,6 +436,7 @@ class FoodSearchProblem:
     """
     A search problem associated with finding the a path that collects all of the
     food (dots) in a Pacman game.
+
     A search state in this problem is a tuple ( pacmanPosition, foodGrid ) where
       pacmanPosition: a tuple (x,y) of integers specifying Pacman's position
       foodGrid:       a Grid (see game.py) of either True or False, specifying remaining food
@@ -457,19 +491,24 @@ class AStarFoodSearchAgent(SearchAgent):
 def foodHeuristic(state, problem):
     """
     Your heuristic for the FoodSearchProblem goes here.
+
     This heuristic must be consistent to ensure correctness.  First, try to come
     up with an admissible heuristic; almost all admissible heuristics will be
     consistent as well.
+
     If using A* ever finds a solution that is worse uniform cost search finds,
     your heuristic is *not* consistent, and probably not admissible!  On the
     other hand, inadmissible or inconsistent heuristics may find optimal
     solutions, so be careful.
+
     The state is a tuple ( pacmanPosition, foodGrid ) where foodGrid is a Grid
     (see game.py) of either True or False. You can call foodGrid.asList() to get
     a list of food coordinates instead.
+
     If you want access to info like walls, capsules, etc., you can query the
     problem.  For example, problem.walls gives you a Grid of where the walls
     are.
+
     If you want to *store* information to be reused in other calls to the
     heuristic, there is a dictionary called problem.heuristicInfo that you can
     use. For example, if you only want to count the walls once and store that
@@ -515,11 +554,14 @@ class ClosestDotSearchAgent(SearchAgent):
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
     A search problem for finding a path to any food.
+
     This search problem is just like the PositionSearchProblem, but has a
     different goal test, which you need to fill in below.  The state space and
     successor function do not need to be changed.
+
     The class definition above, AnyFoodSearchProblem(PositionSearchProblem),
     inherits the methods of the PositionSearchProblem.
+
     You can use this search problem to help you fill in the findPathToClosestDot
     method.
     """
@@ -550,7 +592,9 @@ def mazeDistance(point1, point2, gameState):
     Returns the maze distance between any two points, using the search functions
     you have already built. The gameState can be any game state -- Pacman's
     position in that state is ignored.
+
     Example usage: mazeDistance( (2,4), (5,6), gameState)
+
     This might be a useful helper function for your ApproximateSearchAgent.
     """
     x1, y1 = point1
