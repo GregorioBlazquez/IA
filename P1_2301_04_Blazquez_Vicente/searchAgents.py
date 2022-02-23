@@ -284,14 +284,12 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        print("Ejecuto isGoalState")
-        if state[0] in self.corners:
-            print("Encontrada esquina: "+str(state[0]))
-            if state[0] not in state[1]:
-                state[1].add(state[0])
-                #print("Esquinas visitadas: "+str(state[1]))
-            if len(state[1]) == 4:
-                return True
+        #print("Ejecuto isGoalState")
+
+        if len(state[1]) == 4:
+            return True
+
+        return False
 
     def getSuccessors(self, state):
         """
@@ -318,6 +316,11 @@ class CornersProblem(search.SearchProblem):
             if not self.walls[nextx][nexty]:
                 nextState = (nextx, nexty)
                 conjuntoEsquinas=state[1].copy()
+                if nextState in self.corners:
+                #print("Encontrada esquina: "+str(state[0]))
+                    if nextState not in state[1]:
+                        conjuntoEsquinas.add(nextState)
+                    #print("Esquinas visitadas: "+str(state[1]))
                 successors.append( ( (nextState,conjuntoEsquinas), action, 1) )
 
         self._expanded += 1 # DO NOT CHANGE
