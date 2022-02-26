@@ -284,7 +284,6 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        #print("Ejecuto isGoalState")
 
         if len(state[1]) == 4:
             return True
@@ -317,10 +316,8 @@ class CornersProblem(search.SearchProblem):
                 nextState = (nextx, nexty)
                 conjuntoEsquinas=state[1].copy()
                 if nextState in self.corners:
-                #print("Encontrada esquina: "+str(state[0]))
                     if nextState not in state[1]:
                         conjuntoEsquinas.add(nextState)
-                    #print("Esquinas visitadas: "+str(state[1]))
                 successors.append( ( (nextState,conjuntoEsquinas), action, 1) )
 
         self._expanded += 1 # DO NOT CHANGE
@@ -356,21 +353,17 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    print(str(state))
-    #print("Número de esquinas encontradas: "+str(len(state[1])))
 
-    # Calculamos el minimo de las distancias de manhattan a las esquinas
+    # Calculamos el minimo de las distancias de manhattan a las esquinas no exploradas
     minManhattan=-1
-    for pos in corners:
-        print("Esquina")
-        if pos not in state[1]:
-            aux=disManhattan(state[0],pos)
-            print(aux)
+    for corner in corners:
+        if corner not in state[1]:
+            aux=disManhattan(state[0],corner)
             if (aux<minManhattan) or (minManhattan==-1):
                 minManhattan=aux
-    #print(minManhattan)
+
+    #Caso en el que todas las esquinas están encontradas
     if(minManhattan==-1):
-        print("Hola buenas\n")
         minManhattan=0
 
     height=abs(corners[0][1]-corners[1][1])
@@ -379,20 +372,14 @@ def cornersHeuristic(state, problem):
     lados=[height,width]
     NesquinasEncontradas = len(state[1])
 
-    print("Número de esquinas encontradas: "+str(NesquinasEncontradas))
-
     if NesquinasEncontradas == 0:
-        #print(minManhattan+2*min(lados)+max(lados))
         return minManhattan+2*min(lados)+max(lados)
     elif NesquinasEncontradas == 1:
-        #print(minManhattan+lados[0]+lados[1])
         return minManhattan+lados[0]+lados[1]
     elif NesquinasEncontradas == 2:
-        esquinas = [x for x in corners if x not in state[1]] #list(set(corners)-state[1])
-        #print(minManhattan+disManhattan(esquinas[0],esquinas[1]))
+        esquinas = [x for x in corners if x not in state[1]]
         return minManhattan+disManhattan(esquinas[0],esquinas[1])
     else:
-        #print(minManhattan)
         return minManhattan
 
     
