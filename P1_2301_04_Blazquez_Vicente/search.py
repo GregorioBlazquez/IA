@@ -72,29 +72,27 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
+# Implementación del algoritmo de búsqueda sin repeticiones de las transparencias de teoría
 def generalSearch(problem, listaAbiertos):
     listaAbiertos.push((problem.getStartState(),[],0))
     listaCerrados=[]
 
-    print("Ejecutando generalSearch")
-
     while(True):
         if listaAbiertos.isEmpty(): return []
+
         nodo=listaAbiertos.pop()
         if(problem.isGoalState(nodo[0])):
-            #print(nodo[1])
             return nodo[1]
+        
         # Mantenemos una lista de los nodos ya explorados para no repetirlos        
         if nodo[0] not in listaCerrados:
-            #print("Expansión: "+str(nodo[2]))
             listaCerrados.append(nodo[0])
             # Añadimos los sucesores para explorarlos en el orden dado por la funcion getSuccessors
             for successor in problem.getSuccessors(nodo[0]):
                 lista=nodo[1].copy()
                 lista.append(successor[1])
                 listaAbiertos.push((successor[0],lista,nodo[2]+successor[2]))
-        #print("ITERACION   "+str(nodo))
-
+    
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
@@ -124,8 +122,9 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
+    # Inicializamos la lista de abiertos como una cola de prioridad que ordena en funcion
+    # del tercer elemento del nodo a insertar, es decir, el coste g
     listaAbiertos=util.PriorityQueueWithFunction(lambda item: item[2])
-
     return generalSearch(problem,listaAbiertos)
 
 def nullHeuristic(state, problem=None):
@@ -138,8 +137,9 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+    # Inicializamos la lista de abiertos como una cola de prioridad que ordena en funcion
+    # del tercer elemento del nodo a insertar mas la heuristica, es decir, el coste f=g+h
     listaAbiertos=util.PriorityQueueWithFunction(lambda item: item[2]+heuristic(item[0],problem))
-
     return generalSearch(problem,listaAbiertos)
 
 
