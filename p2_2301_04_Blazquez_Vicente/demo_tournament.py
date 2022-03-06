@@ -10,7 +10,7 @@ from __future__ import annotations  # For Python 3.7
 import numpy as np
 
 from game import Player, TwoPlayerGameState, TwoPlayerMatch
-from heuristic import simple_evaluation_function
+from heuristic import simple_evaluation_function, mamadisima_evaluation_function
 from reversi import (
     Reversi,
     from_array_to_dictionary_board,
@@ -44,10 +44,10 @@ class Heuristic2(StudentHeuristic):
 class Heuristic3(StudentHeuristic):
 
     def get_name(self) -> str:
-        return "heuristic"
+        return "Mamadisimo"
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
-        return simple_evaluation_function(state)
+        return mamadisima_evaluation_function(state)
 
 
 def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:

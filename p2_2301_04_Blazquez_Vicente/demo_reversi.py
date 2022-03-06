@@ -10,7 +10,7 @@ Authors:
 from __future__ import annotations  # For Python 3.7
 
 from game import Player, TwoPlayerGameState, TwoPlayerMatch
-from heuristic import heuristic
+from heuristic import heuristic, heuristica_mamadisima
 from reversi import (Reversi, from_array_to_dictionary_board,
                      from_dictionary_to_array_board)
 from strategy import (ManualStrategy, MinimaxAlphaBetaStrategy,
@@ -47,9 +47,9 @@ player_minimax3 = Player(
 )
 
 player_minimax4 = Player(
-    name='Minimax_4',
+    name='Mamadisima',
     strategy=MinimaxStrategy(
-        heuristic=heuristic,
+        heuristic=heuristica_mamadisima,
         max_depth_minimax=4,
         verbose=0,
     ),
