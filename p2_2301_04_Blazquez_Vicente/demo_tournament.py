@@ -10,7 +10,7 @@ from __future__ import annotations  # For Python 3.7
 import numpy as np
 
 from game import Player, TwoPlayerGameState, TwoPlayerMatch
-from heuristic import simple_evaluation_function, mamadisima_evaluation_function
+from heuristic import simple_evaluation_function, mamadisima_evaluation_function1, mamadisima_evaluation_function2, mamadisima_evaluation_function3, mamadisima_evaluation_function4
 from reversi import (
     Reversi,
     from_array_to_dictionary_board,
@@ -18,7 +18,7 @@ from reversi import (
 )
 from tournament import StudentHeuristic, Tournament
 
-
+'''
 class Heuristic1(StudentHeuristic):
 
     def get_name(self) -> str:
@@ -48,14 +48,38 @@ class Heuristic3(StudentHeuristic):
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
         return simple_evaluation_function(state)
+'''
+class Heuristic1(StudentHeuristic):
+
+    def get_name(self) -> str:
+        return "mamadisima1"
+
+    def evaluation_function(self, state: TwoPlayerGameState) -> float:
+        return mamadisima_evaluation_function1(state)
+
+class Heuristic2(StudentHeuristic):
+
+    def get_name(self) -> str:
+        return "mamadisima2"
+
+    def evaluation_function(self, state: TwoPlayerGameState) -> float:
+        return mamadisima_evaluation_function2(state)
+
+class Heuristic3(StudentHeuristic):
+
+    def get_name(self) -> str:
+        return "mamadisima3"
+
+    def evaluation_function(self, state: TwoPlayerGameState) -> float:
+        return mamadisima_evaluation_function3(state)
 
 class Heuristic4(StudentHeuristic):
 
     def get_name(self) -> str:
-        return "mamadisima"
+        return "mamadisima4"
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
-        return mamadisima_evaluation_function(state)
+        return mamadisima_evaluation_function4(state)
 
 
 def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:
