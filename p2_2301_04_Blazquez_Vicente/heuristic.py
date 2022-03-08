@@ -14,10 +14,9 @@ from typing import Callable, Sequence
 
 import numpy as np
 
-from reversi import Reversi
+from reversi import Reversi, from_dictionary_to_array_board
 
 from game import TwoPlayerGameState
-
 
 class Heuristic(object):
     """Encapsulation of the evaluation fucnction."""
@@ -52,7 +51,7 @@ def simple_evaluation_function(state: TwoPlayerGameState) -> float:
         scores = state.scores
         # Evaluation of the state from the point of view of MAX
 
-        assert iifnstance(scores, (Sequence, np.ndarray))
+        assert isinstance(scores, (Sequence, np.ndarray))
         score_difference = scores[0] - scores[1]
 
         if state.is_player_max(state.player1):
@@ -93,6 +92,8 @@ def mamadisima_evaluation_function(state: TwoPlayerGameState) -> float:
     [ 11 , - 4 , 2 , 2 , 2 , 2 , - 4 , 11 ],[ 8 , 1 , 2 , - 3 , - 3 , 2 , 1 , 8 ],
     [8 , 1 , 2 , - 3 , - 3 , 2 , 1 , 8 ],[ 11 , - 4 , 2 , 2 , 2 , 2 , - 4 , 11 ],
     [- 3 , - 7 , - 4 , 1 , 1 , - 4 , - 7 , - 3 ],[ 20 , - 3 , 11 , 8 , 8 , 11 , - 3 , 20 ]]
+
+    #print(state.is_player_max(state.player1))
     
     # Diferencia de piezas, discos de frontera y cuadrados de disco
     for i in range(8):
@@ -147,50 +148,45 @@ def mamadisima_evaluation_function(state: TwoPlayerGameState) -> float:
         elif (state.board[(7,7)] == state.player2.label): opp_tiles+=1
 
     c = 25 * (my_tiles - opp_tiles)
-
-    
-    
     '''
-    // Cercanía de esquina
-    my_tiles = opp_tiles = 0 ;
-    if (state.board[ 0 ][ 0 ] == ' - ' ) {
-    if (state.board[(0,1 ] == state.player1.label) my_tiles++;
-    elif (state.board[(0,1 ] == state.player2.label) opp_tiles++;
-    if (state.board[ 1 ][ 1 ] == state.player1.label) my_tiles++;
-    elif (state.board[ 1 ][ 1 ] == state.player2.label) opp_tiles++;
-    if (state.board[ 1 ][ 0 ] == state.player1.label) my_tiles++;
-    elif (state.board[ 1 ][ 0 ] == state.player2.label) opp_tiles++;
-    }
-    if (state.board[ 0 ][ 7 ] == ' - ' ) {
-    if (state.board[(0,6 ] == state.player1.label) my_tiles++;
-    elif (state.board[(0,6 ] == state.player2.label) opp_tiles++;
-    if (state.board[ 1 ][ 6 ] == state.player1.label) my_tiles++;
-    elif (state.board[ 1 ][ 6 ] == state.player2.label) opp_tiles++;
-    if (state.board[ 1 ][ 7 ] == state.player1.label) my_tiles++;
-    elif (state.board[ 1 ][ 7 ] == state.player2.label) opp_tiles++;
-    }
-    if (state.board[ 7 ][ 0 ] == ' - ' ) {
-    if (state.board[ 7 ][ 1 ] == state.player1.label) my_tiles++;
-    elif (state.board[ 7 ][ 1 ] == state.player2.label) opp_tiles++;
-    if (state.board[ 6 ][ 1 ] == state.player1.label) my_tiles++;
-    elif (state.board[ 6 ][ 1 ] == state.player2.label) opp_tiles++;
-    if (state.board[ 6 ][ 0 ] == state.player1.label) my_tiles++;
-    elif (state.board[ 6 ][ 0 ] == state.player2.label) opp_tiles++;
-    }
-    if (state.board[ 7 ][ 7 ] == ' - ' ) {
-    if (state.board[ 6 ][ 7 ] == state.player1.label) my_tiles++;
-    elif (state.board[ 6 ][ 7 ] == state.player2.label) opp_tiles++;
-    if (state.board[ 6 ][ 6 ] == state.player1.label) my_tiles++;
-    elif (state.board[ 6 ][ 6 ] == state.player2.label) opp_tiles++;
-    if (state.board[ 7 ][ 6 ] == state.player1.label) my_tiles++;
-    elif (state.board[ 7 ][ 6 ] == state.player2.label) opp_tiles++;
-    }
-    l = - 12.5 * (my_tiles - opp_tiles);
+    tablero=from_dictionary_to_array_board(state.board,8,8)
+    # Cercanía de esquina
+    my_tiles, opp_tiles = 0,0
+    if (tablero[0][0] == '.' ):
+        if (tablero[0][1] == state.player1.label): my_tiles+=1
+        elif (tablero[0][1] == state.player2.label): opp_tiles+=1
+        if (tablero[1][1] == state.player1.label): my_tiles+=1
+        elif (tablero[1][1] == state.player2.label): opp_tiles+=1
+        if (tablero[1][0] == state.player1.label): my_tiles+=1
+        elif (tablero[1][0] == state.player2.label): opp_tiles+=1
+    if (tablero[ 0 ][ 7 ] == '.' ):
+        if (tablero[0][6] == state.player1.label): my_tiles+=1
+        elif (tablero[0][6] == state.player2.label): opp_tiles+=1
+        if (tablero[1][6] == state.player1.label): my_tiles+=1
+        elif (tablero[1][6] == state.player2.label): opp_tiles+=1
+        if (tablero[1][7] == state.player1.label): my_tiles+=1
+        elif (tablero[1][7] == state.player2.label): opp_tiles+=1
+
+    if (tablero[ 7 ][ 0 ] == '.' ):
+        if (tablero[ 7 ][ 1 ] == state.player1.label): my_tiles+=1
+        elif (tablero[ 7 ][ 1 ] == state.player2.label): opp_tiles+=1
+        if (tablero[ 6 ][ 1 ] == state.player1.label): my_tiles+=1
+        elif (tablero[ 6 ][ 1 ] == state.player2.label): opp_tiles+=1
+        if (tablero[ 6 ][ 0 ] == state.player1.label): my_tiles+=1
+        elif (tablero[ 6 ][ 0 ] == state.player2.label): opp_tiles+=1
     
+    if (tablero[ 7 ][ 7 ] == '.' ):
+        if (tablero[ 6 ][ 7 ] == state.player1.label): my_tiles+=1
+        elif (tablero[ 6 ][ 7 ] == state.player2.label): opp_tiles+=1
+        if (tablero[ 6 ][ 6 ] == state.player1.label): my_tiles+=1
+        elif (tablero[ 6 ][ 6 ] == state.player2.label): opp_tiles+=1
+        if (tablero[ 7 ][ 6 ] == state.player1.label): my_tiles+=1
+        elif (tablero[ 7 ][ 6 ] == state.player2.label): opp_tiles+=1
+    l = - 12.5 * (my_tiles - opp_tiles)
 
     # Movilidad
-    my_tiles = len(state.generate_successors(state))
-    opp_tiles = len(state.generate_successors(state))
+    my_tiles = len(state.game.generate_successors(state))
+    opp_tiles = len(state.game.generate_successors(state))
     if (my_tiles > opp_tiles):
         m = ( 100.0 * my_tiles)/(my_tiles + opp_tiles)
     elif ( my_tiles < opp_tiles):
@@ -199,6 +195,11 @@ def mamadisima_evaluation_function(state: TwoPlayerGameState) -> float:
     '''
     #puntaje ponderado final
     state_value = ( 10 * p) + ( 801.724 * c) + ( 382.026 * l) + ( 78.922 * m) + ( 74.396 * f) + ( 10 * d)
+
+    # si es mac devolver +state_value, si es min devolver -state_value
+    '''
+    if state.is_player_max(state.player2):
+        return -state_value'''
 
     return state_value
 

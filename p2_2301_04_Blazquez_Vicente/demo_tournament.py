@@ -44,7 +44,15 @@ class Heuristic2(StudentHeuristic):
 class Heuristic3(StudentHeuristic):
 
     def get_name(self) -> str:
-        return "Mamadisimo"
+        return "simple"
+
+    def evaluation_function(self, state: TwoPlayerGameState) -> float:
+        return simple_evaluation_function(state)
+
+class Heuristic4(StudentHeuristic):
+
+    def get_name(self) -> str:
+        return "mamadisima"
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
         return mamadisima_evaluation_function(state)
@@ -98,7 +106,7 @@ def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:
 
 
 tour = Tournament(max_depth=3, init_match=create_match)
-strats = {'opt1': [Heuristic1], 'opt2': [Heuristic2], 'opt3': [Heuristic3]}
+strats = {'opt1': [Heuristic1], 'opt2': [Heuristic2], 'opt3': [Heuristic3], 'opt4': [Heuristic4]}
 
 n = 1
 scores, totals, names = tour.run(
