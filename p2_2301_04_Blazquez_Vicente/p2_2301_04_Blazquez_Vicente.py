@@ -137,11 +137,12 @@ class SolutionMamadisimo(StudentHeuristic):
 
     # si es mac devolver +state_value, si es min devolver -state_value
     
-    if ((state.is_player_max(state.next_player) and state.next_player.label=='W') or ((not state.is_player_max(state.next_player)) and state.next_player.label!='W')):
+    if ((state.is_player_max(state.next_player) and state.next_player.label=='W') or ((not state.is_player_max(state.next_player)) and state.next_player.label=='B')):
         return -state_value
 
     return state_value
 
+'''
 class Solution2(StudentHeuristic):
   def get_name(self) -> str:
     return "solution2"
@@ -150,3 +151,4 @@ class Solution2(StudentHeuristic):
     time.sleep(3)
     print("awake")
     return 2
+'''

@@ -10,7 +10,7 @@ Authors:
 from __future__ import annotations  # For Python 3.7
 
 from game import Player, TwoPlayerGameState, TwoPlayerMatch
-from heuristic import heuristic, heuristica_mamadisima
+from heuristic import heuristic, heuristica_mamadisima1
 from reversi import (Reversi, from_array_to_dictionary_board,
                      from_dictionary_to_array_board)
 from strategy import (ManualStrategy, MinimaxAlphaBetaStrategy,
@@ -41,7 +41,7 @@ player_minimax3 = Player(
     name='Minimax_3',
     strategy=MinimaxStrategy(
         heuristic=heuristic,
-        max_depth_minimax=4,
+        max_depth_minimax=3,
         verbose=1,
     ),
 )
@@ -49,8 +49,8 @@ player_minimax3 = Player(
 player_minimax4 = Player(
     name='Mamadisima',
     strategy=MinimaxStrategy(
-        heuristic=heuristica_mamadisima,
-        max_depth_minimax=4,
+        heuristic=heuristica_mamadisima1,
+        max_depth_minimax=3,
         verbose=0,
     ),
 )
@@ -65,12 +65,12 @@ player_alphabeta1 = Player(
 )
 
 player_alphabeta2 = Player(
-    name='AlphaBeta_2',
+    name='Mamadisima',
     strategy=MinimaxAlphaBetaStrategy(
-        heuristic=heuristic,
-        max_depth_minimax=4,
-        verbose=0
-    )
+        heuristic=heuristica_mamadisima1,
+        max_depth_minimax=3,
+        verbose=0,
+    ),
 )
 
 
@@ -81,7 +81,7 @@ player_alphabeta2 = Player(
 # player_a, player_b = player_manual, player_minimax4
 
 # minimax alpha-beta vs minimax alpha-beta player
-player_a, player_b = player_minimax4, player_minimax3
+player_b, player_a = player_alphabeta1, player_alphabeta2
 
 
 # minimax alpha-beta vs minimax alpha-beta player
@@ -96,11 +96,14 @@ initial_player = player_a  # Player who moves first.
 
 # Board at an intermediate state of the game.
 initial_board = (
-    ['..B.B..',
-     '.WBBW..',
-     'WBWBB..',
-     '.W.WWW.',
-     '.BBWBWB']
+    ['.WB..BW.',
+    '.WBBW...',
+    'WBWBB...',
+    '.W.WWW..',
+    '.BBWBWB.',
+    'BBWBB...',
+    'WW.WWW..',
+    '.BBWBWW.']
 )
 
 # NOTE Uncoment to use standard initial board.

@@ -230,7 +230,6 @@ class MinimaxAlphaBetaStrategy(Strategy):
         minimax_successor = None
         if state.end_of_game or depth == 0:
             minimax_value = self.heuristic.evaluate(state)
-            
         else:
             minimax_value = np.inf
 
@@ -248,7 +247,8 @@ class MinimaxAlphaBetaStrategy(Strategy):
                 if (successor_minimax_value <= alpha):
                     return successor_minimax_value, minimax_successor
                 beta = min(beta, successor_minimax_value)
-                minimax_successor = successor
+                if(x<minimax_value):
+                    minimax_successor = successor
                 minimax_value = beta
 
         if self.verbose > 1:
@@ -270,9 +270,9 @@ class MinimaxAlphaBetaStrategy(Strategy):
         beta: int,
     ) -> float:
         """Max step of the minimax algorithm."""
+        minimax_successor = None
         if state.end_of_game or depth == 0:
             minimax_value = self.heuristic.evaluate(state)
-            minimax_successor = None
         else:
             minimax_value = -np.inf
 
@@ -290,7 +290,8 @@ class MinimaxAlphaBetaStrategy(Strategy):
                 if (successor_minimax_value >= beta):
                     return successor_minimax_value, minimax_successor
                 alpha = max(alpha, successor_minimax_value)
-                minimax_successor = successor
+                if(x>minimax_value):
+                    minimax_successor = successor
                 minimax_value = alpha
 
         if self.verbose > 1:

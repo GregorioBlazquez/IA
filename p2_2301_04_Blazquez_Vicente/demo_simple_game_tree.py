@@ -1,7 +1,7 @@
 from __future__ import annotations  # For Python 3.7
 
 from game import Player, TwoPlayerGameState, TwoPlayerMatch
-from heuristic import heuristic, heuristica_mamadisima
+from heuristic import heuristic
 from simple_game_tree import SimpleGame
 from strategy import (ManualStrategy, MinimaxAlphaBetaStrategy,
                       MinimaxStrategy, RandomStrategy)

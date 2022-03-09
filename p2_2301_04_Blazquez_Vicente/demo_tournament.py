@@ -10,7 +10,7 @@ from __future__ import annotations  # For Python 3.7
 import numpy as np
 
 from game import Player, TwoPlayerGameState, TwoPlayerMatch
-from heuristic import simple_evaluation_function, mamadisima_evaluation_function1, mamadisima_evaluation_function2, mamadisima_evaluation_function3, mamadisima_evaluation_function4
+from heuristic import simple_evaluation_function, mamadisima_evaluation_function, corners_evaluation_function, movilidad_evaluation_function
 from reversi import (
     Reversi,
     from_array_to_dictionary_board,
@@ -18,8 +18,8 @@ from reversi import (
 )
 from tournament import StudentHeuristic, Tournament
 
-'''
-class Heuristic1(StudentHeuristic):
+
+'''class Heuristic1(StudentHeuristic):
 
     def get_name(self) -> str:
         return "dummy"
@@ -39,7 +39,28 @@ class Heuristic2(StudentHeuristic):
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
         return float(np.random.rand())
+'''
 
+class Heuristic1(StudentHeuristic):
+
+    def get_name(self) -> str:
+        return "Mamadisimo esquinas"
+
+    def evaluation_function(self, state: TwoPlayerGameState) -> float:
+        # Use an auxiliary function.
+        return corners_evaluation_function(state)
+
+    def dummy(self, n: int) -> int:
+        return n + 4
+
+
+class Heuristic2(StudentHeuristic):
+
+    def get_name(self) -> str:
+        return "Mamadisimo Movilidad"
+
+    def evaluation_function(self, state: TwoPlayerGameState) -> float:
+        return movilidad_evaluation_function(state)
 
 class Heuristic3(StudentHeuristic):
 
@@ -48,39 +69,15 @@ class Heuristic3(StudentHeuristic):
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
         return simple_evaluation_function(state)
-'''
-class Heuristic1(StudentHeuristic):
 
-    def get_name(self) -> str:
-        return "mamadisima1"
-
-    def evaluation_function(self, state: TwoPlayerGameState) -> float:
-        return mamadisima_evaluation_function1(state)
-
-class Heuristic2(StudentHeuristic):
-
-    def get_name(self) -> str:
-        return "mamadisima2"
-
-    def evaluation_function(self, state: TwoPlayerGameState) -> float:
-        return mamadisima_evaluation_function2(state)
-
-class Heuristic3(StudentHeuristic):
-
-    def get_name(self) -> str:
-        return "mamadisima3"
-
-    def evaluation_function(self, state: TwoPlayerGameState) -> float:
-        return mamadisima_evaluation_function3(state)
 
 class Heuristic4(StudentHeuristic):
 
     def get_name(self) -> str:
-        return "mamadisima4"
+        return "Mamadisima original"
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
-        return mamadisima_evaluation_function4(state)
-
+        return mamadisima_evaluation_function(state)
 
 def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:
 
@@ -94,11 +91,14 @@ def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:
     )"""
 
     initial_board = (
-        ['..B.B..',
-        '.WBBW..',
-        'WBWBB..',
-        '.W.WWW.',
-        '.BBWBWB']
+        ['..B.B...',
+        '.WBBW...',
+        'WBWBB...',
+        '.W.WWW..',
+        '.BBWBWB.',
+        'WBWBB...',
+        '.W.WWW..',
+        '..BWB...']
     )
 
     if initial_board is None:
