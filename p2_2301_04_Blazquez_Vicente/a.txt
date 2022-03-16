@@ -1,0 +1,29 @@
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Successfully initialised board from array
+Results for tournament where each game is repeated 8=4x2 times, alternating colors for each player
+	total:	opt1_Mamadisimo Pesos	opt2_Mamadisimo Finish	opt3_Mamadisima Original
+opt1_Mamadisimo Pesos	0:	---	0	0
+opt2_Mamadisimo Finish	13:	8	---	5
+opt3_Mamadisima Original	11:	8	3	---
