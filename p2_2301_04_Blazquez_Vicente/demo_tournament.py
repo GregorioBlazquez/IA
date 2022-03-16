@@ -12,7 +12,7 @@ import numpy as np
 import random
 
 from game import Player, TwoPlayerGameState, TwoPlayerMatch
-from heuristic import simple_evaluation_function, mamadisima_evaluation_function, corners_evaluation_function, movilidad_evaluation_function
+from heuristic import simple_evaluation_function, original_evaluation_function, pesos_evaluation_function, finish_evaluation_function, dynamic_evaluation_function
 from reversi import (
     Reversi,
     from_array_to_dictionary_board,
@@ -27,51 +27,48 @@ from tournament import StudentHeuristic, Tournament
 class Heuristic1(StudentHeuristic):
 
     def get_name(self) -> str:
-        return "Mamadisimo esquinas"
+        return "Mamadisimo Pesos"
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
         # Use an auxiliary function.
-        return corners_evaluation_function(state)
-
+        return pesos_evaluation_function(state)
 
 
 class Heuristic2(StudentHeuristic):
 
     def get_name(self) -> str:
-        return "Mamadisimo Movilidad"
+        return "Mamadisimo Finish"
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
-        return movilidad_evaluation_function(state)
+        return finish_evaluation_function(state)
+
 
 class Heuristic3(StudentHeuristic):
+
+    def get_name(self) -> str:
+        return "Mamadisima Original"
+
+    def evaluation_function(self, state: TwoPlayerGameState) -> float:
+        return original_evaluation_function(state)
+
+
+class Heuristic4(StudentHeuristic):
+
+    def get_name(self) -> str:
+        return "Mamadisima Dynamic"
+
+    def evaluation_function(self, state: TwoPlayerGameState) -> float:
+        # Use an auxiliary function.
+        return dynamic_evaluation_function(state)
+
+
+class Heuristic5(StudentHeuristic):
 
     def get_name(self) -> str:
         return "simple"
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
         return simple_evaluation_function(state)
-
-
-class Heuristic4(StudentHeuristic):
-
-    def get_name(self) -> str:
-        return "Mamadisima original"
-
-    def evaluation_function(self, state: TwoPlayerGameState) -> float:
-        return mamadisima_evaluation_function(state)
-
-
-class Heuristic5(StudentHeuristic):
-
-    def get_name(self) -> str:
-        return "dummy"
-
-    def evaluation_function(self, state: TwoPlayerGameState) -> float:
-        # Use an auxiliary function.
-        return self.dummy(123)
-
-    def dummy(self, n: int) -> int:
-        return n + 4
 
 
 class Heuristic6(StudentHeuristic):
@@ -94,21 +91,21 @@ def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:
     )"""
 
     initial_board = [
-        ['..B.B...',
-        '.WBBW...',
-        'WBWBB...',
-        '.W.WWW..',
-        '.BBWBWB.',
-        'WBWBB...',
-        '.W.WWW..',
-        '..BWB...'],
+        ['........',
+        '......W.',
+        '...WWBB.',
+        '..WBBB..',
+        '.WWWWB..',
+        '..BBBW..',
+        '..B.....',
+        '........'],
 
         ['........',
-        '.WBBW...',
-        'WBWBB...',
-        '..WWWW..',
-        '..BWBWB.',
-        '.BWBB...',
+        '.WBBB...',
+        'WBBBB...',
+        '..BWWW..',
+        '..BWWBB.',
+        '.BWWW...',
         '........',
         '........'],
 
@@ -122,14 +119,45 @@ def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:
         '........'],
 
         ['........',
-        '.WBWW...',
-        '..WBB...',
-        '..WBBW..',
-        '..BWBWB.',
-        '.BWBW...',
+        '.WBBB...',
+        '..BBB...',
+        '..BBBW..',
+        '..BBWW..',
+        '.BBBW...',
         '........',
         '........'],
-
+        ['........',
+        '........',
+        '....W...',
+        '...WWWB.',
+        '...BW...',
+        '........',
+        '........',
+        '........'],
+        ['........',
+        '........',
+        '...BW...',
+        '...WWWB.',
+        '...BW...',
+        '........',
+        '........',
+        '........'],
+        ['........',
+        '....W...',
+        '...BBBBB',
+        '...WWBB.',
+        '...BWB..',
+        '........',
+        '........',
+        '........'],
+        ['........',
+        '....WB..',
+        '....WBBB',
+        '..WWWBB.',
+        '..BBWB..',
+        '...BW...',
+        '........',
+        '........']
     ]
 
     num_board = random.randint(0,len(initial_board)-1)
@@ -162,10 +190,9 @@ def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:
 
 
 tour = Tournament(max_depth=3, init_match=create_match)
-strats = {'opt1': [Heuristic1], 'opt2': [Heuristic2], 'opt3': [Heuristic3], 'opt4': [Heuristic4],
-            'opt5': [Heuristic5], 'opt6': [Heuristic6]}
+strats = {'opt1': [Heuristic1], 'opt2': [Heuristic2],'opt3': [Heuristic3]}
 
-n = 2
+n = 3
 scores, totals, names = tour.run(
     student_strategies=strats,
     increasing_depth=False,

@@ -8,9 +8,10 @@
 """
 
 
-from __future__ import annotations  # For Python 3.7
+from __future__ import annotations
+from os import stat  # For Python 3.7
 
-from typing import Callable, Sequence
+from typing import Callable, List, Sequence
 
 import numpy as np
 
@@ -70,7 +71,7 @@ heuristic = Heuristic(
     evaluation_function=simple_evaluation_function,
 )
 
-def mamadisima_evaluation_function(state: TwoPlayerGameState) -> float:
+def original_evaluation_function(state: TwoPlayerGameState) -> float:
     """Devuelve un valor dado por la ponderación de varios aspectos que afectan al juego. 
        En particular pondera: """
 
@@ -93,27 +94,23 @@ def mamadisima_evaluation_function(state: TwoPlayerGameState) -> float:
     [8 , 1 , 2 , - 3 , - 3 , 2 , 1 , 8 ],[ 11 , - 4 , 2 , 2 , 2 , 2 , - 4 , 11 ],
     [- 3 , - 7 , - 4 , 1 , 1 , - 4 , - 7 , - 3 ],[ 20 , - 3 , 11 , 8 , 8 , 11 , - 3 , 20 ]]
 
-    #print(state.is_player_max(state.player1))
-
     my_color=state.next_player.label
-
     if (my_color == 'B'):
         opp_color='W'
     else:
         opp_color='B'
-    
+
     # Diferencia de piezas, discos de frontera y cuadrados de disco
     for i in range(1,9):
         for j in range(1,9):
             if (i,j) in state.board:
-                #print(state.board[(i,j)])
                 if (state.board[(i,j)] == my_color):
                     d += V[i-1][j-1]
                     my_tiles+=1
                 elif (state.board[(i,j)] == opp_color):
                     d -= V[i-1][j-1]
                     opp_tiles+=1
-            
+
                 if (state.board[(i,j)] == my_color or state.board[(i,j)] == opp_color):
                     for k in range(1,9):
                         x = i + X1[k-1]
@@ -130,47 +127,40 @@ def mamadisima_evaluation_function(state: TwoPlayerGameState) -> float:
         p = -( 100.0 * opp_tiles)/(my_tiles + opp_tiles)
     else: p = 0
 
+
     if (my_front_tiles > opp_front_tiles):
         f = -( 100.0 * my_front_tiles)/(my_front_tiles + opp_front_tiles)
     elif (my_front_tiles < opp_front_tiles):
         f = ( 100.0 * opp_front_tiles)/(my_front_tiles + opp_front_tiles)
     else: f = 0
-
-
-    #print(state.board)
     
     # Ocupación de esquina
     my_tiles = opp_tiles = 0
     if (1,1) in state.board:
         if (state.board[(1,1)] == my_color):
-            #print('ESQUINA1')
             my_tiles+=1
         else: opp_tiles+=1
 
     if (1,8) in state.board:
         if (state.board[(1,8)] == my_color):
-            #print('ESQUINA2')
             my_tiles+=1
         else: opp_tiles+=1
 
     if (8,1) in state.board:
         if (state.board[(8,1)] == my_color):
-            #print('ESQUINA3')
             my_tiles+=1
         else: opp_tiles+=1
     
     if (8,8) in state.board:
         if (state.board[(8,8)] == my_color):
-            #print('ESQUINA4')
             my_tiles+=1
         else: opp_tiles+=1
 
     c = 25 * (my_tiles - opp_tiles)
-    
+
+    # Cercanía de esquina
     tablero=from_dictionary_to_array_board(state.board,8,8)
 
-    
-    # Cercanía de esquina
     my_tiles, opp_tiles = 0,0
     if (tablero[0][0] == '.' ):
         if (tablero[0][1] == my_color): my_tiles+=1
@@ -203,32 +193,23 @@ def mamadisima_evaluation_function(state: TwoPlayerGameState) -> float:
         if (tablero[ 7 ][ 6 ] == my_color): my_tiles+=1
         elif (tablero[ 7 ][ 6 ] == opp_color): opp_tiles+=1
     l = - 12.5 * (my_tiles - opp_tiles)
-    '''
+    
+
     # Movilidad
-    my_tiles = len(state.game.generate_successors(state))
-    opp_tiles = len(state.game.generate_successors(state))
-    if (my_tiles > opp_tiles):
-        m = ( 100.0 * my_tiles)/(my_tiles + opp_tiles)
-    elif ( my_tiles < opp_tiles):
-        m = -( 100.0 * opp_tiles)/(my_tiles + opp_tiles)
-    else: m = 0
-    '''
-    #print("Ocupación de esquinas: "+str(801.724*c))
+    m = state.game._choice_diff(state.board)
+    if(state.next_player.label=='W'):
+        m= -m  
+    
     #puntaje ponderado final
     state_value = ( 10 * p) + ( 801.724 * c) + ( 382.026 * l) + ( 78.922 * m) + ( 74.396 * f) + ( 10 * d)
-    #state_value = 100000 * c
-    
-    '''print("Next Player Max: "+str(state.is_player_max(state.next_player)))
-    print("Next Player Label: "+str(my_color))'''
 
     if (state.is_player_max(state.next_player) is False):
-        # print("Negativo")
         return -state_value
 
     return state_value
 
 
-def corners_evaluation_function(state: TwoPlayerGameState) -> float:
+def finish_evaluation_function(state: TwoPlayerGameState) -> float:
     """Devuelve un valor dado por la ponderación de varios aspectos que afectan al juego. 
        En particular pondera: """
 
@@ -251,10 +232,7 @@ def corners_evaluation_function(state: TwoPlayerGameState) -> float:
     [8 , 1 , 2 , - 3 , - 3 , 2 , 1 , 8 ],[ 11 , - 4 , 2 , 2 , 2 , 2 , - 4 , 11 ],
     [- 3 , - 7 , - 4 , 1 , 1 , - 4 , - 7 , - 3 ],[ 20 , - 3 , 11 , 8 , 8 , 11 , - 3 , 20 ]]
 
-    #print(state.is_player_max(state.player1))
-
     my_color=state.next_player.label
-
     if (my_color == 'B'):
         opp_color='W'
     else:
@@ -264,7 +242,6 @@ def corners_evaluation_function(state: TwoPlayerGameState) -> float:
     for i in range(1,9):
         for j in range(1,9):
             if (i,j) in state.board:
-                #print(state.board[(i,j)])
                 if (state.board[(i,j)] == my_color):
                     d += V[i-1][j-1]
                     my_tiles+=1
@@ -293,42 +270,40 @@ def corners_evaluation_function(state: TwoPlayerGameState) -> float:
     elif (my_front_tiles < opp_front_tiles):
         f = ( 100.0 * opp_front_tiles)/(my_front_tiles + opp_front_tiles)
     else: f = 0
-
-
-    #print(state.board)
     
     # Ocupación de esquina
+
+    '''c = state.game._corner_diff(state.board)
+
+    if(state.next_player.label=='W'):
+        c= -c '''
+    
     my_tiles = opp_tiles = 0
     if (1,1) in state.board:
         if (state.board[(1,1)] == my_color):
-            #print('ESQUINA1')
             my_tiles+=1
         else: opp_tiles+=1
 
     if (1,8) in state.board:
         if (state.board[(1,8)] == my_color):
-            #print('ESQUINA2')
             my_tiles+=1
         else: opp_tiles+=1
 
     if (8,1) in state.board:
         if (state.board[(8,1)] == my_color):
-            #print('ESQUINA3')
             my_tiles+=1
         else: opp_tiles+=1
     
     if (8,8) in state.board:
         if (state.board[(8,8)] == my_color):
-            #print('ESQUINA4')
             my_tiles+=1
         else: opp_tiles+=1
 
     c = 25 * (my_tiles - opp_tiles)
-    
+
+    # Cercanía de esquina
     tablero=from_dictionary_to_array_board(state.board,8,8)
 
-    
-    # Cercanía de esquina
     my_tiles, opp_tiles = 0,0
     if (tablero[0][0] == '.' ):
         if (tablero[0][1] == my_color): my_tiles+=1
@@ -361,31 +336,65 @@ def corners_evaluation_function(state: TwoPlayerGameState) -> float:
         if (tablero[ 7 ][ 6 ] == my_color): my_tiles+=1
         elif (tablero[ 7 ][ 6 ] == opp_color): opp_tiles+=1
     l = - 12.5 * (my_tiles - opp_tiles)
-    '''
-    # Movilidad
-    my_tiles = len(state.game.generate_successors(state))
-    opp_tiles = len(state.game.generate_successors(state))
-    if (my_tiles > opp_tiles):
-        m = ( 100.0 * my_tiles)/(my_tiles + opp_tiles)
-    elif ( my_tiles < opp_tiles):
-        m = -( 100.0 * opp_tiles)/(my_tiles + opp_tiles)
-    else: m = 0
-    '''
-    #print("Ocupación de esquinas: "+str(801.724*c))
-    #puntaje ponderado final
-    state_value = ( 10 * p) + ( 10000 * c) + ( 382.026 * l) + ( 78.922 * m) + ( 74.396 * f) + ( 10 * d)
-    #state_value = 100000 * c
     
-    '''print("Next Player Max: "+str(state.is_player_max(state.next_player)))
-    print("Next Player Label: "+str(my_color))'''
+
+    # Movilidad
+    m = state.game._choice_diff(state.board)
+    if(state.next_player.label=='W'):
+        m= -m  
+    
+    finish=0
+    if (len(state.board)%2==0):
+        finish=100
+
+    #puntaje ponderado final
+    state_value = ( 10 * p) + ( 801.724 * c) + ( 382.026 * l) + ( 78.922 * m) + ( 74.396 * f) + ( 10 * d) + finish*500
 
     if (state.is_player_max(state.next_player) is False):
-        # print("Negativo")
         return -state_value
 
     return state_value
 
-def movilidad_evaluation_function(state: TwoPlayerGameState) -> float:
+def pesos_evaluation_function(state: TwoPlayerGameState) -> float:
+    """Devuelve un valor dado por la ponderación de varios aspectos que afectan al juego. 
+       En particular pondera: """
+    d = 0
+ 
+    V = [[ 4, -3, 2, 2, 2, 2, -3 , 4],
+        [ -3, -4, -1, -1, -1, -1, -4, -3],
+        [ 2, -1 ,1 , 0 , 0 , 1 , -1 , 2],
+        [ 2, -1 , 0 , 1 , 1 , 0 , -1 , 2],
+        [ 2, -1 , 0 , 1 , 1 , 0 , -1 , 2],
+        [ 2, -1 , 1 , 0 , 0 , 1 , -1 , 2],
+        [-3, -4 , -1 , -1 , -1 , -1 , -4, -3],
+        [ 4, -3, 2, 2, 2, 2, -3, 4]]
+
+
+    my_color=state.next_player.label
+
+    if (my_color == 'B'):
+        opp_color='W'
+    else:
+        opp_color='B'
+    
+    # Diferencia de piezas teniendo en cuenta el peso del tablero
+    for i in range(1,9):
+        for j in range(1,9):
+            if (i,j) in state.board:
+                if (state.board[(i,j)] == my_color):
+                    d += V[i-1][j-1]
+                elif (state.board[(i,j)] == opp_color):
+                    d -= V[i-1][j-1]
+
+    state_value = d
+
+    if (state.is_player_max(state.next_player) is False):
+        return -state_value
+
+    return state_value
+
+
+def dynamic_evaluation_function(state: TwoPlayerGameState) -> float:
     """Devuelve un valor dado por la ponderación de varios aspectos que afectan al juego. 
        En particular pondera: """
 
@@ -417,6 +426,7 @@ def movilidad_evaluation_function(state: TwoPlayerGameState) -> float:
     else:
         opp_color='B'
     
+    total_d=0
     # Diferencia de piezas, discos de frontera y cuadrados de disco
     for i in range(1,9):
         for j in range(1,9):
@@ -424,11 +434,13 @@ def movilidad_evaluation_function(state: TwoPlayerGameState) -> float:
                 #print(state.board[(i,j)])
                 if (state.board[(i,j)] == my_color):
                     d += V[i-1][j-1]
+                    total_d+=V[i-1][j-1]
                     my_tiles+=1
                 elif (state.board[(i,j)] == opp_color):
                     d -= V[i-1][j-1]
+                    total_d+=V[i-1][j-1]
                     opp_tiles+=1
-            
+
                 if (state.board[(i,j)] == my_color or state.board[(i,j)] == opp_color):
                     for k in range(1,9):
                         x = i + X1[k-1]
@@ -439,6 +451,8 @@ def movilidad_evaluation_function(state: TwoPlayerGameState) -> float:
                                 else: opp_front_tiles+=1
                                 break
     
+    d=100*d/total_d
+
     if (my_tiles > opp_tiles):
         p = ( 100.0 * my_tiles)/(my_tiles + opp_tiles)
     elif ( my_tiles < opp_tiles):
@@ -452,40 +466,16 @@ def movilidad_evaluation_function(state: TwoPlayerGameState) -> float:
     else: f = 0
 
 
-    #print(state.board)
     
     # Ocupación de esquina
-    my_tiles = opp_tiles = 0
-    if (1,1) in state.board:
-        if (state.board[(1,1)] == my_color):
-            #print('ESQUINA1')
-            my_tiles+=1
-        else: opp_tiles+=1
+    c = state.game._corner_diff(state.board)
+    if(state.next_player.label=='W'):
+        c= -c 
 
-    if (1,8) in state.board:
-        if (state.board[(1,8)] == my_color):
-            #print('ESQUINA2')
-            my_tiles+=1
-        else: opp_tiles+=1
-
-    if (8,1) in state.board:
-        if (state.board[(8,1)] == my_color):
-            #print('ESQUINA3')
-            my_tiles+=1
-        else: opp_tiles+=1
-    
-    if (8,8) in state.board:
-        if (state.board[(8,8)] == my_color):
-            #print('ESQUINA4')
-            my_tiles+=1
-        else: opp_tiles+=1
-
-    c = 25 * (my_tiles - opp_tiles)
-    
-    tablero=from_dictionary_to_array_board(state.board,8,8)
-
-    
+     
     # Cercanía de esquina
+    tablero=from_dictionary_to_array_board(state.board,8,8)   
+
     my_tiles, opp_tiles = 0,0
     if (tablero[0][0] == '.' ):
         if (tablero[0][1] == my_color): my_tiles+=1
@@ -517,42 +507,37 @@ def movilidad_evaluation_function(state: TwoPlayerGameState) -> float:
         elif (tablero[ 6 ][ 6 ] == opp_color): opp_tiles+=1
         if (tablero[ 7 ][ 6 ] == my_color): my_tiles+=1
         elif (tablero[ 7 ][ 6 ] == opp_color): opp_tiles+=1
-    l = - 12.5 * (my_tiles - opp_tiles)
+    l = 100 * (my_tiles - opp_tiles)/(my_tiles + opp_tiles)
     
     # Movilidad
-    my_tiles = len(state.game.generate_successors(state))
-    opp_tiles = len(state.game.generate_successors(state))
-    if (my_tiles > opp_tiles):
-        m = ( 100.0 * my_tiles)/(my_tiles + opp_tiles)
-    elif ( my_tiles < opp_tiles):
-        m = -( 100.0 * opp_tiles)/(my_tiles + opp_tiles)
-    else: m = 0
+    m = state.game._choice_diff(state.board)
+    if(state.next_player.label=='W'):
+        m= -m 
 
-    #print("Ocupación de esquinas: "+str(801.724*c))
     #puntaje ponderado final
     state_value = ( 10 * p) + ( 801.724 * c) + ( 382.026 * l) + ( 78.922 * m) + ( 74.396 * f) + ( 10 * d)
-    #state_value = 100000 * c
-    
-    '''print("Next Player Max: "+str(state.is_player_max(state.next_player)))
-    print("Next Player Label: "+str(my_color))'''
 
     if (state.is_player_max(state.next_player) is False):
-        # print("Negativo")
         return -state_value
 
     return state_value
 
 heuristica_mamadisima = Heuristic(
     name='Heuristic mamadisima',
-    evaluation_function = mamadisima_evaluation_function,
+    evaluation_function = original_evaluation_function,
 )
 
-heuristica_corners = Heuristic(
-    name='Heuristic corners',
-    evaluation_function = corners_evaluation_function,
+heuristica_pesos = Heuristic(
+    name='Heuristic pesos',
+    evaluation_function = pesos_evaluation_function,
 )
 
-heuristica_movilidad = Heuristic(
+heuristica_dynamic = Heuristic(
     name='Heuristic movilidad',
-    evaluation_function = movilidad_evaluation_function,
+    evaluation_function = dynamic_evaluation_function,
+)
+
+heuristica_finish = Heuristic(
+    name='Heuristic finish',
+    evaluation_function = finish_evaluation_function,
 )
