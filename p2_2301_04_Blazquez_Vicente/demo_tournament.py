@@ -21,9 +21,6 @@ from reversi import (
 from tournament import StudentHeuristic, Tournament
 
 
-
-
-
 class Heuristic1(StudentHeuristic):
 
     def get_name(self) -> str:
@@ -190,9 +187,9 @@ def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:
 
 
 tour = Tournament(max_depth=3, init_match=create_match)
-strats = {'opt1': [Heuristic1], 'opt2': [Heuristic2],'opt3': [Heuristic3]}
+strats = {'opt1': [Heuristic1], 'opt2': [Heuristic2],'opt3': [Heuristic3],'opt4': [Heuristic4],'opt5': [Heuristic5],'opt6': [Heuristic6]}
 
-n = 4
+n = 5
 scores, totals, names = tour.run(
     student_strategies=strats,
     increasing_depth=False,

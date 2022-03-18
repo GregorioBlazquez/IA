@@ -19,6 +19,8 @@ from reversi import Reversi, from_dictionary_to_array_board
 
 from game import TwoPlayerGameState
 
+import math
+
 class Heuristic(object):
     """Encapsulation of the evaluation fucnction."""
 
@@ -341,7 +343,7 @@ def finish_evaluation_function(state: TwoPlayerGameState) -> float:
     # Movilidad
     m = state.game._choice_diff(state.board)
     if(state.next_player.label=='W'):
-        m= -m  
+        m=-m  
     
     finish=0
     if (len(state.board)%2==0):
@@ -377,16 +379,21 @@ def pesos_evaluation_function(state: TwoPlayerGameState) -> float:
     else:
         opp_color='B'
     
+    p=0
     # Diferencia de piezas teniendo en cuenta el peso del tablero
     for i in range(1,9):
         for j in range(1,9):
             if (i,j) in state.board:
                 if (state.board[(i,j)] == my_color):
+                    p+=1
                     d += V[i-1][j-1]
                 elif (state.board[(i,j)] == opp_color):
+                    p-=1
                     d -= V[i-1][j-1]
 
     state_value = d
+    if (len(state.board)>=58):
+        state_value+=p
 
     if (state.is_player_max(state.next_player) is False):
         return -state_value
@@ -434,11 +441,11 @@ def dynamic_evaluation_function(state: TwoPlayerGameState) -> float:
                 #print(state.board[(i,j)])
                 if (state.board[(i,j)] == my_color):
                     d += V[i-1][j-1]
-                    total_d+=V[i-1][j-1]
+                    total_d+=abs(V[i-1][j-1])
                     my_tiles+=1
                 elif (state.board[(i,j)] == opp_color):
                     d -= V[i-1][j-1]
-                    total_d+=V[i-1][j-1]
+                    total_d+=abs(V[i-1][j-1])
                     opp_tiles+=1
 
                 if (state.board[(i,j)] == my_color or state.board[(i,j)] == opp_color):
@@ -475,7 +482,6 @@ def dynamic_evaluation_function(state: TwoPlayerGameState) -> float:
      
     # Cercanía de esquina
     tablero=from_dictionary_to_array_board(state.board,8,8)   
-
     my_tiles, opp_tiles = 0,0
     if (tablero[0][0] == '.' ):
         if (tablero[0][1] == my_color): my_tiles+=1
@@ -507,15 +513,21 @@ def dynamic_evaluation_function(state: TwoPlayerGameState) -> float:
         elif (tablero[ 6 ][ 6 ] == opp_color): opp_tiles+=1
         if (tablero[ 7 ][ 6 ] == my_color): my_tiles+=1
         elif (tablero[ 7 ][ 6 ] == opp_color): opp_tiles+=1
-    l = 100 * (my_tiles - opp_tiles)/(my_tiles + opp_tiles)
+    if ((my_tiles + opp_tiles)!=0):
+        l = 100 * (my_tiles - opp_tiles)/(my_tiles + opp_tiles)
+    else: l=0
     
     # Movilidad
     m = state.game._choice_diff(state.board)
     if(state.next_player.label=='W'):
         m= -m 
 
+    #calculo exponencial para la ponderacion de numero de fichas que come
+    x=len(state.board)
+    f_p=0.00010178124*math.exp(0.2206950568365*x)
+    f_m=100*math.exp(-(x-30)*(x-30)/10)
     #puntaje ponderado final
-    state_value = ( 10 * p) + ( 801.724 * c) + ( 382.026 * l) + ( 78.922 * m) + ( 74.396 * f) + ( 10 * d)
+    state_value = f_p*p + 90*c + 40*l + f_m*m + 50*f + 50*d
 
     if (state.is_player_max(state.next_player) is False):
         return -state_value
