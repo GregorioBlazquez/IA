@@ -75,6 +75,18 @@ class Heuristic6(StudentHeuristic):
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
         return float(np.random.rand())
 
+class Heuristic7(StudentHeuristic):
+
+    def get_name(self) -> str:
+        return "dummy"
+
+    def evaluation_function(self, state: TwoPlayerGameState) -> float:
+        # Use an auxiliary function.
+        return self.dummy(123)
+
+    def dummy(self, n: int) -> int:
+        return n + 4
+
 def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:
 
     initial_board = None#np.zeros((dim_board, dim_board))
@@ -88,6 +100,16 @@ def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:
 
     initial_board = [
         ['........',
+        '........',
+        '........',
+        '...WB...',
+        '...BW...',
+        '........',
+        '........',
+        '........']
+    ]
+
+    '''['........',
         '......W.',
         '...WWBB.',
         '..WBBB..',
@@ -153,8 +175,16 @@ def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:
         '..BBWB..',
         '...BW...',
         '........',
-        '........']
-    ]
+        '........'],
+        ['.WB..BW.',
+        '.WBBW...',
+        'WBWBB...',
+        '.W.WWW..',
+        '.BBWBWB.',
+        'BBWBB...',
+        'WW.WWW..',
+        '.BBWBWW.']
+    '''
 
     num_board = random.randint(0,len(initial_board)-1)
     if initial_board is None:
@@ -187,9 +217,9 @@ def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:
 
 
 tour = Tournament(max_depth=3, init_match=create_match)
-strats = {'opt1': [Heuristic1]}#, 'opt2': [Heuristic2],'opt3': [Heuristic3],'opt4': [Heuristic4],'opt5': [Heuristic5],'opt6': [Heuristic6]}
+strats = {'opt1': [Heuristic3]}#, 'opt2': [Heuristic2],'opt3': [Heuristic3],'opt4': [Heuristic4],'opt5': [Heuristic5],'opt6': [Heuristic6], 'opt7': [Heuristi]}
 
-n = 8
+n = 1
 scores, totals, names = tour.run(
     student_strategies=strats,
     increasing_depth=False,

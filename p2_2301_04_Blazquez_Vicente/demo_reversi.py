@@ -56,18 +56,18 @@ player_minimax4 = Player(
 )
 
 player_alphabeta1 = Player(
-    name='Heuristica_dinamica',
+    name='Heuristica_original',
     strategy=MinimaxAlphaBetaStrategy(
-        heuristic=heuristica_dynamic,
-        max_depth_minimax=4,
+        heuristic=heuristica_original,
+        max_depth_minimax=3,
         verbose=0
     )
 )
 
 player_alphabeta2 = Player(
-    name='Heuristica_original',
+    name='Heuristica_dinamica',
     strategy=MinimaxAlphaBetaStrategy(
-        heuristic=heuristica_original,
+        heuristic=heuristica_dynamic,
         max_depth_minimax=3,
         verbose=0,
     ),

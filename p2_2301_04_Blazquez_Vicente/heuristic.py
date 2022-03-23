@@ -96,11 +96,8 @@ def original_evaluation_function(state: TwoPlayerGameState) -> float:
     [8 , 1 , 2 , - 3 , - 3 , 2 , 1 , 8 ],[ 11 , - 4 , 2 , 2 , 2 , 2 , - 4 , 11 ],
     [- 3 , - 7 , - 4 , 1 , 1 , - 4 , - 7 , - 3 ],[ 20 , - 3 , 11 , 8 , 8 , 11 , - 3 , 20 ]]
 
-    my_color=state.next_player.label
-    if (my_color == 'B'):
-        opp_color='W'
-    else:
-        opp_color='B'
+    my_color=state.player1.label
+    opp_color=state.player2.label
 
     # Diferencia de piezas, discos de frontera y cuadrados de disco
     for i in range(1,9):
@@ -137,7 +134,10 @@ def original_evaluation_function(state: TwoPlayerGameState) -> float:
     else: f = 0
     
     # Ocupación de esquina
-    my_tiles = opp_tiles = 0
+
+    c = state.game._corner_diff(state.board)
+
+    '''my_tiles = opp_tiles = 0
     if (1,1) in state.board:
         if (state.board[(1,1)] == my_color):
             my_tiles+=1
@@ -158,7 +158,7 @@ def original_evaluation_function(state: TwoPlayerGameState) -> float:
             my_tiles+=1
         else: opp_tiles+=1
 
-    c = 25 * (my_tiles - opp_tiles)
+    c = 25 * (my_tiles - opp_tiles)'''
 
     # Cercanía de esquina
     tablero=from_dictionary_to_array_board(state.board,8,8)
@@ -199,16 +199,15 @@ def original_evaluation_function(state: TwoPlayerGameState) -> float:
 
     # Movilidad
     m = state.game._choice_diff(state.board)
-    if(state.next_player.label=='W'):
-        m= -m  
     
     #puntaje ponderado final
     state_value = ( 10 * p) + ( 801.724 * c) + ( 382.026 * l) + ( 78.922 * m) + ( 74.396 * f) + ( 10 * d)
 
-    if (state.is_player_max(state.next_player) is False):
-        return -state_value
+    if ((state.is_player_max(state.player1) and (state.next_player.label=='W'))
+    or (not state.is_player_max(state.player2) and (state.next_player.label=='B'))):
+        return state_value
 
-    return state_value
+    return -state_value
 
 
 def finish_evaluation_function(state: TwoPlayerGameState) -> float:
@@ -234,11 +233,8 @@ def finish_evaluation_function(state: TwoPlayerGameState) -> float:
     [8 , 1 , 2 , - 3 , - 3 , 2 , 1 , 8 ],[ 11 , - 4 , 2 , 2 , 2 , 2 , - 4 , 11 ],
     [- 3 , - 7 , - 4 , 1 , 1 , - 4 , - 7 , - 3 ],[ 20 , - 3 , 11 , 8 , 8 , 11 , - 3 , 20 ]]
 
-    my_color=state.next_player.label
-    if (my_color == 'B'):
-        opp_color='W'
-    else:
-        opp_color='B'
+    my_color=state.player1.label
+    opp_color=state.player2.label
     
     # Diferencia de piezas, discos de frontera y cuadrados de disco
     for i in range(1,9):
@@ -275,12 +271,9 @@ def finish_evaluation_function(state: TwoPlayerGameState) -> float:
     
     # Ocupación de esquina
 
-    '''c = state.game._corner_diff(state.board)
-
-    if(state.next_player.label=='W'):
-        c= -c '''
+    c = state.game._corner_diff(state.board)
     
-    my_tiles = opp_tiles = 0
+    '''my_tiles = opp_tiles = 0
     if (1,1) in state.board:
         if (state.board[(1,1)] == my_color):
             my_tiles+=1
@@ -301,7 +294,7 @@ def finish_evaluation_function(state: TwoPlayerGameState) -> float:
             my_tiles+=1
         else: opp_tiles+=1
 
-    c = 25 * (my_tiles - opp_tiles)
+    c = 25 * (my_tiles - opp_tiles)'''
 
     # Cercanía de esquina
     tablero=from_dictionary_to_array_board(state.board,8,8)
@@ -342,8 +335,6 @@ def finish_evaluation_function(state: TwoPlayerGameState) -> float:
 
     # Movilidad
     m = state.game._choice_diff(state.board)
-    if(state.next_player.label=='W'):
-        m=-m  
     
     finish=0
     if (len(state.board)%2==0):
@@ -352,10 +343,11 @@ def finish_evaluation_function(state: TwoPlayerGameState) -> float:
     #puntaje ponderado final
     state_value = ( 10 * p) + ( 801.724 * c) + ( 382.026 * l) + ( 78.922 * m) + ( 74.396 * f) + ( 10 * d) + finish*500
 
-    if (state.is_player_max(state.next_player) is False):
-        return -state_value
+    if ((state.is_player_max(state.player1) and (state.next_player.label=='W'))
+    or (not state.is_player_max(state.player2) and (state.next_player.label=='B'))):
+        return state_value
 
-    return state_value
+    return -state_value
 
 def pesos_evaluation_function(state: TwoPlayerGameState) -> float:
     """Devuelve un valor dado por la ponderación de varios aspectos que afectan al juego. 
@@ -372,13 +364,9 @@ def pesos_evaluation_function(state: TwoPlayerGameState) -> float:
         [ 4, -3, 2, 2, 2, 2, -3, 4]]
 
 
-    my_color=state.next_player.label
+    my_color=state.player1.label
+    opp_color=state.player2.label
 
-    if (my_color == 'B'):
-        opp_color='W'
-    else:
-        opp_color='B'
-    
     p=0
     # Diferencia de piezas teniendo en cuenta el peso del tablero
     for i in range(1,9):
@@ -395,10 +383,11 @@ def pesos_evaluation_function(state: TwoPlayerGameState) -> float:
     if (len(state.board)>=58):
         state_value+=p
 
-    if (state.is_player_max(state.next_player) is False):
-        return -state_value
+    if ((state.is_player_max(state.player1) and (state.next_player.label=='W'))
+    or (not state.is_player_max(state.player2) and (state.next_player.label=='B'))):
+        return state_value
 
-    return state_value
+    return -state_value
 
 
 def dynamic_evaluation_function(state: TwoPlayerGameState) -> float:
@@ -426,12 +415,8 @@ def dynamic_evaluation_function(state: TwoPlayerGameState) -> float:
 
     #print(state.is_player_max(state.player1))
 
-    my_color=state.next_player.label
-
-    if (my_color == 'B'):
-        opp_color='W'
-    else:
-        opp_color='B'
+    my_color=state.player1.label
+    opp_color=state.player2.label
     
     total_d=0
     # Diferencia de piezas, discos de frontera y cuadrados de disco
@@ -466,18 +451,16 @@ def dynamic_evaluation_function(state: TwoPlayerGameState) -> float:
         p = -( 100.0 * opp_tiles)/(my_tiles + opp_tiles)
     else: p = 0
 
-    if (my_front_tiles > opp_front_tiles):
+    '''if (my_front_tiles > opp_front_tiles):
         f = -( 100.0 * my_front_tiles)/(my_front_tiles + opp_front_tiles)
     elif (my_front_tiles < opp_front_tiles):
         f = ( 100.0 * opp_front_tiles)/(my_front_tiles + opp_front_tiles)
-    else: f = 0
+    else: f = 0'''
 
 
     
     # Ocupación de esquina
     c = state.game._corner_diff(state.board)
-    if(state.next_player.label=='W'):
-        c= -c 
 
      
     # Cercanía de esquina
@@ -519,27 +502,33 @@ def dynamic_evaluation_function(state: TwoPlayerGameState) -> float:
     
     # Movilidad
     m = state.game._choice_diff(state.board)
-    if(state.next_player.label=='W'):
-        m= -m 
 
     #calculo exponencial para la ponderacion de numero de fichas que come
     x=len(state.board)
     f_p=0.00010178124*math.exp(0.2206950568365*x)
-    f_m=100*math.exp(-(x-30)*(x-30)/10)
-    print("VALORES IMPORTANTES:")
-    print("x="+str(x)+"/nf_p="+str(f_p)+"/nf_m="+str(f_m))
+    f_m=100*math.exp(-(x-30)*(x-30)/400)
+    #print("VALORES IMPORTANTES:")
+    #print("x="+str(x))
+    #print("f_p="+str(f_p))
+    #print("f_m="+str(f_m))
     #puntaje ponderado final
-    state_value = f_p*p + 90*c + 40*l + f_m*m + 50*f + 50*d
-    print("VALOR GLOBAL")
-    print("f_p*p="+str(f_p*p)+"/n90*c="+str(90*c)+"/n40*l="+str(40*l)+"/nf_m*m="+str(f_m*m)+"/n50*f="+str(50*f)+"/n50*d="+str(50*d))
+    state_value = f_p*p + 90*c + f_m*m + 50*d
+    #print("VALOR GLOBAL")
+    #print("f_p*p="+str(f_p*p))
+    #print("90*c="+str(90*c))
+    #print("40*l="+str(40*l))
+    #print("f_m*m="+str(f_m*m))
+    #print("50*f="+str(50*f))
+    #print("50*d="+str(50*d))
 
 
-    if (state.is_player_max(state.next_player) is False):
-        print(str(-state_value))
-        return -state_value
+    if ((state.is_player_max(state.player1) and (state.next_player.label=='W'))
+    or (not state.is_player_max(state.player2) and (state.next_player.label=='B'))):
+        #print("Devuelvo positivo: "+str(state_value))
+        return state_value
 
-    print(str(state_value))
-    return state_value
+    #print("Devuelvo negativo: "+str(-state_value))
+    return -state_value
 
 heuristica_original = Heuristic(
     name='Heuristic original',
@@ -560,3 +549,78 @@ heuristica_finish = Heuristic(
     name='Heuristic finish',
     evaluation_function = finish_evaluation_function,
 )
+'''
+Simple_evaluation_funtion
+Sin poda alpha beta
+28,04831051826477
+62,656657457351685
+58,9730920791626
+52,713990211486816
+51,59214377403259
+43,863667726516724
+28,81133532524109
+33,33422303199768
+53,14336824417114
+34,19199562072754
+33,74930381774902
+27,151485681533813
+47,03356122970581
+55,66102600097656
+30,12916326522827
+28,73763108253479
+
+Con poda alpha beta
+13,91988229751587
+10,152012825012207
+14,191892147064209
+20,95055651664734
+14,739522457122803
+21,945508241653442
+13,190967559814453
+19,129712343215942
+25,289428234100342
+25,059165954589844
+14,027509689331055
+20,888200283050537
+12,566542863845825
+15,835341215133667
+19,817294597625732
+25,8651123046875
+
+Mamadisimo_original
+Con poda alpha beta
+5,336374998092651
+25,297266006469727
+24,80735206604004
+27,39106583595276
+30,385689735412598
+31,82372283935547
+24,288930654525757
+32,052382469177246
+28,158876180648804
+25,150311946868896
+21,603012084960938
+29,622210025787354
+25,51299810409546
+29,428514003753662
+20,310075521469116
+6,375949144363403
+
+Sin poda alpha beta
+15,11690092086792
+62,26992583274841
+62,57741618156433
+61,151073932647705
+49,82190990447998
+63,292993783950806
+67,8502836227417
+17,81824016571045
+50,93729853630066
+60,89662408828735
+63,66688561439514
+17,15149235725403
+64,70521688461304
+70,12701511383057
+67,8318088054657
+85,72095894813538
+'''

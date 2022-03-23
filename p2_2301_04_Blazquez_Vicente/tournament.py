@@ -138,7 +138,7 @@ class Tournament(object):
                     )
                     pl2 = Player(
                         name=name2,
-                        strategy=MinimaxAlphaBetaStrategy( # MinimaxAlphaBetaStrategy(
+                        strategy=MinimaxAlphaBetaStrategy( # MinimaxStrategy(
                             heuristic=Heuristic(name=sh2.get_name(), evaluation_function=sh2.evaluation_function),
                             max_depth_minimax=depth,
                             verbose=0,

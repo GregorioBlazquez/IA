@@ -81,6 +81,7 @@ class MinimaxStrategy(Strategy):
         heuristic: Heuristic,
         max_depth_minimax: int,
         verbose: int = 0,
+        num_op: int = 0,
     ) -> None:
         super().__init__(verbose)
         self.heuristic = heuristic
@@ -92,6 +93,9 @@ class MinimaxStrategy(Strategy):
         gui: bool = False,
     ) -> TwoPlayerGameState:
         """Compute the next state in the game."""
+
+        self.num_op=0
+
 
         minimax_value, minimax_successor = self._max_value(
             state,
@@ -108,6 +112,7 @@ class MinimaxStrategy(Strategy):
         if minimax_successor:
             minimax_successor.minimax_value = minimax_value
 
+        print(str(self.num_op))
         return minimax_successor
 
     def _min_value(
@@ -124,6 +129,7 @@ class MinimaxStrategy(Strategy):
             minimax_value = np.inf
 
             for successor in self.generate_successors(state):
+                self.num_op+=1
                 if self.verbose > 1:
                     print('{}: {}'.format(state.board, minimax_value))
 
@@ -155,6 +161,7 @@ class MinimaxStrategy(Strategy):
             minimax_value = -np.inf
 
             for successor in self.generate_successors(state):
+                self.num_op+=1
                 if self.verbose > 1:
                     print('{}: {}'.format(state.board, minimax_value))
 
@@ -180,6 +187,7 @@ class MinimaxAlphaBetaStrategy(Strategy):
         heuristic: Heuristic,
         max_depth_minimax: int,
         verbose: int = 0,
+        num_op: int =0,
     ) -> None:
         super().__init__(verbose)
         self.heuristic = heuristic
@@ -194,6 +202,7 @@ class MinimaxAlphaBetaStrategy(Strategy):
 
         alpha = -np.inf
         beta = np.inf
+        self.num_op=0
         
         minimax_value, minimax_successor = self._max_value(
             state,
@@ -217,6 +226,7 @@ class MinimaxAlphaBetaStrategy(Strategy):
         if minimax_successor:
             minimax_successor.minimax_value = minimax_value
 
+        print(str(self.num_op))
         return minimax_successor
 
     def _min_value(
@@ -234,6 +244,7 @@ class MinimaxAlphaBetaStrategy(Strategy):
             minimax_value = np.inf
 
             for successor in self.generate_successors(state):
+                self.num_op+=1
                 if self.verbose > 1:
                     print('{}: {}'.format(state.board, minimax_value))
 
@@ -256,12 +267,6 @@ class MinimaxAlphaBetaStrategy(Strategy):
 
         return minimax_value, minimax_successor
 
-
-        if self.verbose > 1:
-            print('{}: {}'.format(state.board, minimax_value))
-
-        return minimax_value, minimax_successor
-
     def _max_value(
         self,
         state: TwoPlayerGameState,
@@ -277,6 +282,7 @@ class MinimaxAlphaBetaStrategy(Strategy):
             minimax_value = -np.inf
 
             for successor in self.generate_successors(state):
+                self.num_op+=1
                 if self.verbose > 1:
                     print('{}: {}'.format(state.board, minimax_value))
 
