@@ -526,16 +526,23 @@ def dynamic_evaluation_function(state: TwoPlayerGameState) -> float:
     x=len(state.board)
     f_p=0.00010178124*math.exp(0.2206950568365*x)
     f_m=100*math.exp(-(x-30)*(x-30)/10)
+    print("VALORES IMPORTANTES:")
+    print("x="+str(x)+"/nf_p="+str(f_p)+"/nf_m="+str(f_m))
     #puntaje ponderado final
     state_value = f_p*p + 90*c + 40*l + f_m*m + 50*f + 50*d
+    print("VALOR GLOBAL")
+    print("f_p*p="+str(f_p*p)+"/n90*c="+str(90*c)+"/n40*l="+str(40*l)+"/nf_m*m="+str(f_m*m)+"/n50*f="+str(50*f)+"/n50*d="+str(50*d))
+
 
     if (state.is_player_max(state.next_player) is False):
+        print(str(-state_value))
         return -state_value
 
+    print(str(state_value))
     return state_value
 
-heuristica_mamadisima = Heuristic(
-    name='Heuristic mamadisima',
+heuristica_original = Heuristic(
+    name='Heuristic original',
     evaluation_function = original_evaluation_function,
 )
 
@@ -545,7 +552,7 @@ heuristica_pesos = Heuristic(
 )
 
 heuristica_dynamic = Heuristic(
-    name='Heuristic movilidad',
+    name='Heuristic dinámica',
     evaluation_function = dynamic_evaluation_function,
 )
 

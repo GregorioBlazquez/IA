@@ -20,7 +20,6 @@ from reversi import (
 )
 from tournament import StudentHeuristic, Tournament
 
-
 class Heuristic1(StudentHeuristic):
 
     def get_name(self) -> str:
@@ -168,7 +167,8 @@ def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:
         except ValueError:
             raise ValueError('Wrong configuration of the board')
         else:
-            print("Successfully initialised board from array")
+            height=8
+            #print("Successfully initialised board from array")
 
     game = Reversi(
         player1=player1,
@@ -187,25 +187,25 @@ def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:
 
 
 tour = Tournament(max_depth=3, init_match=create_match)
-strats = {'opt1': [Heuristic1], 'opt2': [Heuristic2],'opt3': [Heuristic3],'opt4': [Heuristic4],'opt5': [Heuristic5],'opt6': [Heuristic6]}
+strats = {'opt1': [Heuristic1]}#, 'opt2': [Heuristic2],'opt3': [Heuristic3],'opt4': [Heuristic4],'opt5': [Heuristic5],'opt6': [Heuristic6]}
 
-n = 5
+n = 8
 scores, totals, names = tour.run(
     student_strategies=strats,
     increasing_depth=False,
     n_pairs=n,
-    allow_selfmatch=False,
+    allow_selfmatch=True,
 )
 
-print(
+'''print(
     'Results for tournament where each game is repeated '
     + '%d=%dx2 times, alternating colors for each player' % (2 * n, n),
-)
+)'''
 
 # print(totals)
 # print(scores)
 
-print('\ttotal:', end='')
+'''print('\ttotal:', end='')
 for name1 in names:
     print('\t%s' % (name1), end='')
 print()
@@ -216,4 +216,4 @@ for name1 in names:
             print('\t---', end='')
         else:
             print('\t%d' % (scores[name1][name2]), end='')
-    print()
+    print()'''

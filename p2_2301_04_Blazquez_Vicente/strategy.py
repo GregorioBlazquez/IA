@@ -298,37 +298,3 @@ class MinimaxAlphaBetaStrategy(Strategy):
             print('{}: {}'.format(state.board, minimax_value))
 
         return minimax_value, minimax_successor
-
-'''
-    def next_move(
-        self,
-        state: TwoPlayerGameState,
-        gui: bool = False,
-    ) -> TwoPlayerGameState:
-        """Compute the next state in the game."""
-
-        # NOTE <YOUR CODE HERE>
-
-
-        if minimax_successor:
-            minimax_successor.minimax_value = minimax_value
-
-        return minimax_successor
-
-        """
-        # Use this code snippet to trace the execution of the algorithm
-
-                 if self.verbose > 1:
-                    print('{}: [{:.2g}, {:.2g}]'.format(
-                            state.board,
-                            alpha,
-                            beta,
-                        )
-                    )
-        """
-
-        if minimax_successor:
-            minimax_successor.minimax_value = minimax_value
-
-        return minimax_successor
-'''
