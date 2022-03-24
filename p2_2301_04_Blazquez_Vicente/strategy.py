@@ -112,7 +112,6 @@ class MinimaxStrategy(Strategy):
         if minimax_successor:
             minimax_successor.minimax_value = minimax_value
 
-        print(str(self.num_op))
         return minimax_successor
 
     def _min_value(
@@ -226,7 +225,6 @@ class MinimaxAlphaBetaStrategy(Strategy):
         if minimax_successor:
             minimax_successor.minimax_value = minimax_value
 
-        print(str(self.num_op))
         return minimax_successor
 
     def _min_value(

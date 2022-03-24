@@ -100,16 +100,6 @@ def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:
 
     initial_board = [
         ['........',
-        '........',
-        '........',
-        '...WB...',
-        '...BW...',
-        '........',
-        '........',
-        '........']
-    ]
-
-    '''['........',
         '......W.',
         '...WWBB.',
         '..WBBB..',
@@ -184,7 +174,7 @@ def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:
         'BBWBB...',
         'WW.WWW..',
         '.BBWBWW.']
-    '''
+    ]
 
     num_board = random.randint(0,len(initial_board)-1)
     if initial_board is None:
@@ -198,7 +188,7 @@ def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:
             raise ValueError('Wrong configuration of the board')
         else:
             height=8
-            #print("Successfully initialised board from array")
+            print("Successfully initialised board from array")
 
     game = Reversi(
         player1=player1,
@@ -217,25 +207,25 @@ def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:
 
 
 tour = Tournament(max_depth=3, init_match=create_match)
-strats = {'opt1': [Heuristic3]}#, 'opt2': [Heuristic2],'opt3': [Heuristic3],'opt4': [Heuristic4],'opt5': [Heuristic5],'opt6': [Heuristic6], 'opt7': [Heuristi]}
+strats = {'opt1': [Heuristic1], 'opt2': [Heuristic2],'opt3': [Heuristic3],'opt4': [Heuristic4],'opt5': [Heuristic5],'opt6': [Heuristic6], 'opt7': [Heuristic7]}
 
-n = 1
+n = 5
 scores, totals, names = tour.run(
     student_strategies=strats,
     increasing_depth=False,
     n_pairs=n,
-    allow_selfmatch=True,
+    allow_selfmatch=False,
 )
 
-'''print(
+print(
     'Results for tournament where each game is repeated '
     + '%d=%dx2 times, alternating colors for each player' % (2 * n, n),
-)'''
+)
 
 # print(totals)
 # print(scores)
 
-'''print('\ttotal:', end='')
+print('\ttotal:', end='')
 for name1 in names:
     print('\t%s' % (name1), end='')
 print()
@@ -246,4 +236,4 @@ for name1 in names:
             print('\t---', end='')
         else:
             print('\t%d' % (scores[name1][name2]), end='')
-    print()'''
+    print()

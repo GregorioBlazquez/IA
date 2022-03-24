@@ -156,11 +156,7 @@ class Tournament(object):
             players = [pl2, pl1]
         game = self.__init_match(players[0], players[1])
         try:
-            tiempo_inicial=time.time()
             game_scores = game.play_match()
-            tiempo_final=time.time()
-            tiempo_ejecucion=tiempo_final-tiempo_inicial
-            print(tiempo_ejecucion)
             # let's get the scores (do not assume they will always be binary)
             # we assume a higher score is better
             if player1_first:
