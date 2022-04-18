@@ -123,7 +123,7 @@ sum([A|L],Norma) :- sum(L,Sum), Norma is Sum+A.
 dividir([A|[]],N,[B|[]]) :- B is A/N, !.
 dividir([A|L],N,[B|Resultado]) :- dividir(L,N,Resultado), B is A/N.
 normalizar(Distribucion_sin_normalizar, Distribucion) :- sum(Distribucion_sin_normalizar, Norma),
-dividir(Distribucion_sin_normalizar, Norma, Distribucion). /* ¿Hace falta acabar con una interrogacion? */
+dividir(Distribucion_sin_normalizar, Norma, Distribucion). /* ¿Hace falta acabar con una exclamacion? */
 
 /***************
 * EJERCICIO 7. divergencia_kl/3
@@ -135,8 +135,17 @@ dividir(Distribucion_sin_normalizar, Norma, Distribucion). /* ¿Hace falta acaba
 *		KL: Numero de valor real. Divergencia KL.
 *
 ****************/
-
-divergencia_kl(D1, D2, KL) :- print('Error. Este ejercicio no esta implementado todavia.'), !, fail.
+distribucion(L) :- sum(L,1.0), print(L).
+calculo_kl([],[_|_],_) :- print('ERROR 6.3. Listas de distinto tamaño'), !, fail.
+calculo_kl([_|_],[],_) :- print('ERROR 6.3. Listas de distinto tamaño'), !, fail.
+calculo_kl([], [], 0.0).
+calculo_kl([0.0|_], [_|_], _) :- print('ERROR 6.1. Divergencia KL no definida.'), !, fail.
+calculo_kl([_|_], [0.0|_], _) :- print('ERROR 6.1. Divergencia KL no definida.'), !, fail.
+calculo_kl([X|LX], [Y|LY], KL) :- calculo_kl(LX, LY, K), KL is K+(X*log(X/Y)).
+divergencia_kl(LX, LY, KL) :- calculo_kl(LX, LY, KL), distribucion(LX), distribucion(LY). /* ¿Hace falta acabar con una exclamacion? */
+/***************************************************************************
+Falta añadir el control de errores de si no es una distribucion
+***************************************************************************/
 
 /***************
 * EJERCICIO 8. producto_kronecker/3
