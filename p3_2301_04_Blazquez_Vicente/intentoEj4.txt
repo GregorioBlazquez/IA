@@ -1,0 +1,18 @@
+
+my_length([],0).
+my_length([_|L],N) :- my_length(L,N1), N is N1 + 1.
+
+slice([X|_],1,1,[X]) :- !.
+slice(_, Menor, Mayor,  _) :- Menor>Mayor, print('ERROR 3.2 Indices.'), !, fail.
+slice(L, N, Mayor, _) :- N<Mayor, my_length(L,N), print('ERROR 3.3 Longitud de lista.'), !, fail.
+
+slice([X|L], 1, Mayor, [X|Sublista]) :- Mayor>1, Mayor1 is Mayor-1,
+   slice(L, 1, Mayor1, Sublista).
+slice([_|L], Menor, Mayor, Sublista) :- Menor>1, 
+	Menor1 is Menor-1, Mayor1 is Mayor-1, slice(L, Menor1, Mayor1, Sublista).
+
+contiene([],_) :- print('ERROR 3.1 Elementos.'), !, fail.
+contiene([X|_],Y) :-  Y=X, !.
+contiene([_|L],Y) :- contiene(L, Y).
+
+sublista(lista,Menor,Mayor,E,L) :- contiene(L,E), slice(lista, Menor, Mayor, L).
