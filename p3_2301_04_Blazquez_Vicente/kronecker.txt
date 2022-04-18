@@ -1,0 +1,12 @@
+
+% Calcula el producto de un número fila de la matriz
+producto_fila([X],Y, [S]) :- S is X*Y, !.
+producto_fila([A|L],Y, [B|R]) :- producto_fila(L,Y,R), B is A*Y.
+
+% Calcula el producto de un número por una matriz
+producto_matriz([X],Y, [S]) :- producto_fila(X,Y,S), !.
+producto_matriz([A|L],Y, [B|R]) :- producto_matriz(L,Y,R), producto_fila(A,Y,B).
+
+%producto_kronecker([[3,4]], [[0,5], [6,7]], R).
+producto_kronecker([[X]],Y, [S]) :- producto_matriz(Y,X,S), !.
+producto_kronecker([A|L],Y, [B|R]) :- producto_kronecker(L,Y,R), producto_matriz(Y,A,B).
