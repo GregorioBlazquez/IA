@@ -27,7 +27,9 @@ slice([_|Xs],I,K,Ys) :- I > 1,
 *		Resultado: Numero de valor real resultado de la operacion sum_pot_prod. 
 *
 ****************/
-sum_pot_prod(X, Y, Potencia, Resultado) :- print('Error. Este ejercicio no esta implementado todavia.'), !, fail.
+sum_pot_prod(_, _, Potencia, _) :- Potencia<0, print('ERROR 1.1 Potencia.'), !, fail.
+sum_pot_prod([], _, _, _) :- print('ERROR 1.2 Longitud.'), !, fail.
+sum_pot_prod(_, [], _, _) :- print('ERROR 1.2 Longitud.'), !, fail.
 sum_pot_prod([A|[]], [B|[]], Potencia, Resultado) :- Resultado is (A*B)^Potencia, !.
 sum_pot_prod([A|LA],[B|LB], Potencia, Resultado2) :- sum_pot_prod(LA, LB, Potencia, Resultado), Resultado2 is Resultado+(A*B)^Potencia.
 
@@ -42,7 +44,14 @@ sum_pot_prod([A|LA],[B|LB], Potencia, Resultado2) :- sum_pot_prod(LA, LB, Potenc
 *		Y : Numero de valor real. Penultimo elemento.
 *
 ****************/
-segundo_penultimo(L, X, Y) :- print('Error. Este ejercicio no esta implementado todavia.'), !, fail.
+penultimo([B,_|[]],B) :- !.
+penultimo([_|L],X) :- penultimo(L,X).
+segundo_penultimo([], _, _) :- print('ERROR 2.1 Longitud.'), !, fail.
+segundo_penultimo([_], _, _) :- print('ERROR 2.1 Longitud.'), !, fail.
+segundo_penultimo([A,B], X, Y) :- X is B, Y is A, !.
+segundo_penultimo([_,A,_], X, Y) :- X is A, Y is A, !.
+segundo_penultimo([_,A|L],X,Y) :- penultimo(L,Y), X is A, !.
+
 
 /***************
 * EJERCICIO 4. sublista/5
@@ -56,7 +65,26 @@ segundo_penultimo(L, X, Y) :- print('Error. Este ejercicio no esta implementado 
 *		Sublista: Sublista de salida de cadenas de texto.
 *
 ****************/
-sublista(L, Menor, Mayor, E, Sublista) :- print('Error. Este ejercicio no esta implementado todavia.'), !, fail.
+
+
+
+
+/*contiene(L,A) :- !.*/
+my_length([],0).
+my_length([_|L],N) :- my_length(L,N1), N is N1 + 1.
+
+
+contiene(L,Y) :- contiene([X|L], Y), Y=X, !.
+contiene(L,Y) :- contiene([X|L], Y).
+contiene([X|L],Y) :- contiene(L,Y) or X=Y
+
+sublista([X|_],1,1,_,[X]).
+sublista(_, Menor, Mayor, _, _) :- Menor>Mayor, print('ERROR 3.2 Indices.'), !, fail.
+sublista(L, _, Mayor, N, _) :- N<Mayor,my_length(L,N), print('ERROR 3.3 Indices.'), !, fail.
+sublista([X|L], 1, Mayor, E, [X|Sublista]) :- Mayor>1, Mayor1 is Mayor-1,
+   sublista(L, 1, Mayor1, E, Sublista).
+sublista([_|L], Menor, Mayor, E, Sublista) :- Menor>1, 
+	Menor1 is Menor-1, Mayor1 is Mayor-1, sublista(L, Menor1, Mayor1, E, Sublista).
 
 /***************
 * EJERCICIO 5. espacio_lineal/4
@@ -69,7 +97,16 @@ sublista(L, Menor, Mayor, E, Sublista) :- print('Error. Este ejercicio no esta i
 *               Rejilla: Vector de numeros de valor real resultante con la rejilla.
 *
 ****************/
-espacio_lineal(Menor, Mayor, Numero_elementos, Rejilla) :- print('Error. Este ejercicio no esta implementado todavia.'), !, fail.
+numElm(Menor, Mayor, Numero_elementos, Incremento) :-
+   Incremento is (Mayor-Menor)/Numero_elementos, print(Incremento),!.
+rejilla(Menor, 1, _, [Menor]) :- !.
+rejilla(Menor, Numero_elementos, Incremento, [Menor|Rejilla]) :-
+   rejilla(Menor1, Numero_elementos1, Incremento, Rejilla),
+   Menor1 is Menor+Incremento, Numero_elementos1 is Numero_elementos-1.
+espacio_lineal(Menor, Mayor, _, _) :- Menor>Mayor, print('ERROR 5.1 Indices.'), !, fail.
+espacio_lineal(Menor, Mayor, Numero_elementos, Rejilla) :- 
+   numElm(Menor, Mayor, Numero_elementos, Incremento),
+   rejilla(Menor, Numero_elementos, Incremento, Rejilla).
 
 /***************
 * EJERCICIO 6. normalizar/2
@@ -80,7 +117,13 @@ espacio_lineal(Menor, Mayor, Numero_elementos, Rejilla) :- print('Error. Este ej
 *		Distribucion: Vector de numeros reales de salida. Distribucion normalizada.
 *
 ****************/
-normalizar(Distribucion_sin_normalizar, Distribucion) :- print('Error. Este ejercicio no esta implementado todavia.'), !, fail.
+sum([N|_],_) :- N<0, print('ERROR 5.1. Negativos'), !, fail.
+sum([],0) :- !.
+sum([A|L],Norma) :- sum(L,Sum), Norma is Sum+A.
+dividir([A|[]],N,[B|[]]) :- B is A/N, !.
+dividir([A|L],N,[B|Resultado]) :- dividir(L,N,Resultado), B is A/N.
+normalizar(Distribucion_sin_normalizar, Distribucion) :- sum(Distribucion_sin_normalizar, Norma),
+dividir(Distribucion_sin_normalizar, Norma, Distribucion). /* ¿Hace falta acabar con una interrogacion? */
 
 /***************
 * EJERCICIO 7. divergencia_kl/3
@@ -92,6 +135,7 @@ normalizar(Distribucion_sin_normalizar, Distribucion) :- print('Error. Este ejer
 *		KL: Numero de valor real. Divergencia KL.
 *
 ****************/
+
 divergencia_kl(D1, D2, KL) :- print('Error. Este ejercicio no esta implementado todavia.'), !, fail.
 
 /***************
