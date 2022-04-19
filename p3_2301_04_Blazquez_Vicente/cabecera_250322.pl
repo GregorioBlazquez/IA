@@ -163,10 +163,10 @@ producto_matriz([X],Y, [S]) :- producto_fila(X,Y,S), !.
 producto_matriz([A|L],Y, [B|R]) :- producto_matriz(L,Y,R), producto_fila(A,Y,B).
 
 %producto_kronecker([[3,4]], [[0,5], [6,7]], R).
-producto_kronecker([[X]],Y, [S]) :- producto_matriz(Y,X,S), !.
-producto_kronecker([[A|L]],Y, [B|R]) :- producto_kronecker([L],Y,R), producto_matriz(Y,A,B), !.
-producto_kronecker([A|L],Y, [B|[R]]) :- 
-    producto_kronecker(L,Y,R), producto_kronecker([A],Y,B), !.
+producto_kronecker([[X]],Y, [[S]]) :- producto_matriz(Y,X,S), !.
+producto_kronecker([[A|L]],Y, [[B|R]]) :- producto_kronecker([L],Y,[R]), producto_matriz(Y,A,B), !.
+producto_kronecker([A|L],Y, [B|R]) :- 
+    producto_kronecker(L,Y,R), producto_kronecker([A],Y,[B]), !.
 
 /***************
 * EJERCICIO 9a. distancia_euclidea/3
@@ -211,7 +211,10 @@ calcular_distancias(M_entrenamiento, [X_test|M_test], [Fila_Resultados|Matriz_re
 *               Y_test: Vector de valores alfanumericos de una distribucion categorica. Cada etiqueta corresponde a una instancia de X_test.
 *
 ****************/
-predecir_etiquetas(Y_entrenamiento, K, Matriz_resultados, Y_test) :- print('Error. Este ejercicio no esta implementado todavia.'), !, fail.
+predecir_etiquetas(_, _, [], []).
+predecir_etiquetas(Y_entrenamiento, K, [X|Matriz_resultados], [Etiqueta|Etiquetas]) :- 
+   predecir_etiquetas(Y_entrenamiento, K, Matriz_resultados, Etiquetas), 
+   predecir_etiqueta(Y_entrenamiento, K, X, Etiqueta).
 
 /***************
 * EJERCICIO 9d. predecir_etiqueta/4
@@ -224,7 +227,10 @@ predecir_etiquetas(Y_entrenamiento, K, Matriz_resultados, Y_test) :- print('Erro
 *               Etiqueta: Elemento de valor alfanumerico.
 *
 ****************/
-predecir_etiqueta(Y_entrenamiento, K, Vec_distancias, Etiqueta) :- print('Error. Este ejercicio no esta implementado todavia.'), !, fail.
+predecir_etiqueta(Y_entrenamiento, K, Vec_distancias, Etiqueta) :- 
+   calcular_K_etiquetas_mas_relevantes(Y_entrenamiento, K, Vec_distancias, K_etiquetas),
+   calcular_etiqueta_mas_relevante(K_etiquetas, Etiqueta).
+
 
 /***************
 * EJERCICIO 9e. calcular_K_etiquetas_mas_relevantes/4
@@ -237,7 +243,18 @@ predecir_etiqueta(Y_entrenamiento, K, Vec_distancias, Etiqueta) :- print('Error.
 *		K_etiquetas: Vector de valores alfanumericos de una distribucion categorica.
 *
 ****************/
-calcular_K_etiquetas_mas_relevantes(Y_entrenamiento, K, Vec_distancias, K_etiquetas) :- print('Error. Este ejercicio no esta implementado todavia.'), !, fail.
+calcular_tuplas([],[],[]).
+calcular_tuplas([Y|Y_entrenamiento], [D|Vec_distancias], [[D|Y]|Tuplas]) :- 
+   calcular_tuplas(Y_entrenamiento, Vec_distancias, Tuplas).
+
+cortarKEtiquetas(_, 0, []).
+cortarKEtiquetas([[_|Etiqueta]|TuplasOrdenadas], K, [Etiqueta|K1_etiquetas]) :- 
+   K1 is K-1, cortarKEtiquetas(TuplasOrdenadas, K1, K1_etiquetas).
+
+calcular_K_etiquetas_mas_relevantes(Y_entrenamiento, K, Vec_distancias, K_etiquetas) :- 
+   calcular_tuplas(Y_entrenamiento, Vec_distancias, Tuplas), msort(Tuplas, TuplasOrdenadas),
+   cortarKEtiquetas(TuplasOrdenadas, K, K_etiquetas), !.
+
 
 /***************
 * EJERCICIO 9f. calcular_etiqueta_mas_relevante/2
@@ -248,7 +265,40 @@ calcular_K_etiquetas_mas_relevantes(Y_entrenamiento, K, Vec_distancias, K_etique
 *               Etiqueta: Elemento de valor alfanumerico.
 *
 ****************/
-calcular_etiqueta_mas_relevante(K_etiquetas, Etiqueta) :- print('Error. Este ejercicio no esta implementado todavia.'), !, fail.
+% pack(L1,L2) :- the list L2 is obtained from the list L1 by packing
+%    repeated occurrences of elements into separate sublists.
+%    (list,list) (+,?)
+pack([],[]).
+pack([X|Xs],[Z|Zs]) :- transfer(X,Xs,Ys,Z), pack(Ys,Zs).
+
+% transfer(X,Xs,Ys,Z) Ys is the list that remains from the list Xs
+%    when all leading copies of X are removed and transfered to Z
+transfer(X,[],[],[X]).
+transfer(X,[Y|Ys],[Y|Ys],[X]) :- X \= Y.
+transfer(X,[X|Xs],Ys,[X|Zs]) :- transfer(X,Xs,Ys,Zs).
+
+% encode(L1,L2) :- the list L2 is obtained from the list L1 by run-length
+%    encoding. Consecutive duplicates of elements are encoded as terms [N,E],
+%    where N is the number of duplicates of the element E.
+%    (list,list) (+,?)
+encode(L1,L2) :- pack(L1,L), transform(L,L2).
+
+transform([],[]).
+transform([[X|Xs]|Ys],[[N,X]|Zs]) :- length([X|Xs],N), transform(Ys,Zs).
+
+calcular_contadores(L, Res) :- msort(L, Sorted), encode(Sorted, Res).
+
+masFrec([X|_],[Y|_]) :- X>Y.
+menIgFrec([X|_],[Y|_]) :- X=<Y.
+maximo_etiquetas([],[0,_]).
+maximo_etiquetas([E|Etiquetas], Etiqueta) :- 
+    maximo_etiquetas(Etiquetas, Etiqueta), menIgFrec(E,Etiqueta).
+maximo_etiquetas([E|Etiquetas], E) :- 
+    maximo_etiquetas(Etiquetas, Etiqueta), masFrec(E,Etiqueta).
+
+calcular_etiqueta_mas_relevante(K_etiquetas, Etiqueta) :- 
+   calcular_contadores(K_etiquetas, Etiquetas), 
+   maximo_etiquetas(Etiquetas, [_,Etiqueta]), !.
 
 /***************
 * EJERCICIO 9g. k_vecinos_proximos/5
@@ -262,7 +312,10 @@ calcular_etiqueta_mas_relevante(K_etiquetas, Etiqueta) :- print('Error. Este eje
 *		Y_test: Vector de valores alfanumericos de una distribucion categorica. Cada etiqueta corresponde a una instancia de X_test.
 *
 ****************/
-k_vecinos_proximos(X_entrenamiento, Y_entrenamiento, K, X_test, Y_test) :- print('Error. Este ejercicio no esta implementado todavia.'), !, fail.
+k_vecinos_proximos(X_entrenamiento, Y_entrenamiento, K, X_test, Y_test) :- 
+   calcular_distancias(X_entrenamiento, X_test, Matriz_Distancias),
+   predecir_etiquetas(Y_entrenamiento, K, Matriz_Distancias, Y_test), !.
+
 
 /***************
 * EJERCICIO 9h. clasifica_patrones/4
@@ -275,4 +328,30 @@ k_vecinos_proximos(X_entrenamiento, Y_entrenamiento, K, X_test, Y_test) :- print
 *		tasa_aciertos: Tasa de acierto promediada sobre las iteraciones leave-one-out
 *
 ****************/
-clasifica_patrones('iris_patrones.csv','iris_etiquetas.csv',K,tasa_aciertos) :- print('Error. Este ejercicio no esta implementado todavia.'), !, fail.
+clasifica_patrones(Patrones,Etiquetas,K,Tasa_aciertos) :- 
+   csv_read_file(Patrones, Rows1), csv_read_file(Etiquetas, Rows2),
+   leave_one_out(Rows1, Rows2, K, Tasa_aciertos), !.
+
+leave_one_out(Rows1, Rows2, K, Tasa_aciertos) :- 
+   iterar(length(Rows1), Rows1, Rows2, K, Tasa_aciertos).
+
+iterar(0, _, _, _, 0.0).
+iterar(N, Rows1, Rows2, K, Tasa_aciertos+Tasa_acierto/length(Rows1)) :- 
+   N1 is N-1, iterar(N1, Rows1, Rows2, K, Tasa_aciertos), 
+   tasa_acierto(N1, Rows1, Rows2, K, Tasa_acierto).
+
+tasa_acierto(N, Rows1, Rows2, K, 0.0) :- 
+   remove_at(X, Rows1, N, K_vecinos), remove_at(Real, Rows2, N, K_etiquetas),
+   k_vecinos_proximos(K_vecinos, K_etiquetas, K, X, Prediccion), Prediccion\=Real.
+tasa_acierto(N, Rows1, Rows2, K, 1.0) :- 
+   remove_at(X, Rows1, N, K_vecinos), remove_at(Real, Rows2, N, K_etiquetas),
+   k_vecinos_proximos(K_vecinos, K_etiquetas, K, X, Prediccion), Prediccion=Real.
+
+
+% The first element in the list is number 1.
+% remove_at(X,L,K,R) :- X is the K'th element of the list L; R is the
+%    list that remains when the K'th element is removed from L.
+%    (element,list,integer,list) (?,?,+,?)
+remove_at(X,[X|Xs],1,Xs).
+remove_at(X,[Y|Xs],K,[Y|Ys]) :- K > 1, 
+   K1 is K - 1, remove_at(X,Xs,K1,Ys).
