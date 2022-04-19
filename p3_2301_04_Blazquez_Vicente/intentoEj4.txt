@@ -15,4 +15,4 @@ contiene([],_) :- print('ERROR 3.1 Elementos.'), !, fail.
 contiene([X|_],Y) :-  Y=X, !.
 contiene([_|L],Y) :- contiene(L, Y).
 
-sublista(lista,Menor,Mayor,E,L) :- contiene(L,E), slice(lista, Menor, Mayor, L).
+sublista(lista,Menor,Mayor,E,Sublista) :- contiene(Sublista,E), slice(lista, Menor, Mayor, Sublista).

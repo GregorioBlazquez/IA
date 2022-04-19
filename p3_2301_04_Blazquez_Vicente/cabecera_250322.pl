@@ -65,26 +65,23 @@ segundo_penultimo([_,A|L],X,Y) :- penultimo(L,Y), X is A, !.
 *		Sublista: Sublista de salida de cadenas de texto.
 *
 ****************/
-
-
-
-
-/*contiene(L,A) :- !.*/
 my_length([],0).
 my_length([_|L],N) :- my_length(L,N1), N is N1 + 1.
 
+sliceList([X|_],1,1,[X]) :- !.
+sliceList(_, Menor, Mayor,  _) :- Menor>Mayor, print('ERROR 3.2 Indices.'), !, fail.
+sliceList(L, N, Mayor, _) :- N<Mayor, my_length(L,N), print('ERROR 3.3 Longitud de lista.'), !, fail.
 
-contiene(L,Y) :- contiene([X|L], Y), Y=X, !.
-contiene(L,Y) :- contiene([X|L], Y).
-contiene([X|L],Y) :- contiene(L,Y) or X=Y
+sliceList([X|L], 1, Mayor, [X|Sublista]) :- Mayor>1, Mayor1 is Mayor-1,
+   sliceList(L, 1, Mayor1, Sublista).
+sliceList([_|L], Menor, Mayor, Sublista) :- Menor>1, 
+	Menor1 is Menor-1, Mayor1 is Mayor-1, sliceList(L, Menor1, Mayor1, Sublista).
 
-sublista([X|_],1,1,_,[X]).
-sublista(_, Menor, Mayor, _, _) :- Menor>Mayor, print('ERROR 3.2 Indices.'), !, fail.
-sublista(L, _, Mayor, N, _) :- N<Mayor,my_length(L,N), print('ERROR 3.3 Indices.'), !, fail.
-sublista([X|L], 1, Mayor, E, [X|Sublista]) :- Mayor>1, Mayor1 is Mayor-1,
-   sublista(L, 1, Mayor1, E, Sublista).
-sublista([_|L], Menor, Mayor, E, Sublista) :- Menor>1, 
-	Menor1 is Menor-1, Mayor1 is Mayor-1, sublista(L, Menor1, Mayor1, E, Sublista).
+contiene([],_) :- print('ERROR 3.1 Elemento.'), !, fail.
+contiene([X|_],Y) :-  Y=X, !.
+contiene([_|L],Y) :- contiene(L, Y).
+
+sublista(Lista,Menor,Mayor,E,Sublista) :- sliceList(Lista, Menor, Mayor, Sublista), contiene(Sublista,E), !.
 
 /***************
 * EJERCICIO 5. espacio_lineal/4
@@ -98,11 +95,10 @@ sublista([_|L], Menor, Mayor, E, Sublista) :- Menor>1,
 *
 ****************/
 numElm(Menor, Mayor, Numero_elementos, Incremento) :-
-   Incremento is (Mayor-Menor)/Numero_elementos, print(Incremento),!.
+   Incremento is (Mayor-Menor)/(Numero_elementos-1), !.
 rejilla(Menor, 1, _, [Menor]) :- !.
 rejilla(Menor, Numero_elementos, Incremento, [Menor|Rejilla]) :-
-   rejilla(Menor1, Numero_elementos1, Incremento, Rejilla),
-   Menor1 is Menor+Incremento, Numero_elementos1 is Numero_elementos-1.
+   Numero_elementos1 is Numero_elementos-1, Menor1 is Menor+Incremento, rejilla(Menor1, Numero_elementos1, Incremento, Rejilla).
 espacio_lineal(Menor, Mayor, _, _) :- Menor>Mayor, print('ERROR 5.1 Indices.'), !, fail.
 espacio_lineal(Menor, Mayor, Numero_elementos, Rejilla) :- 
    numElm(Menor, Mayor, Numero_elementos, Incremento),
@@ -120,6 +116,7 @@ espacio_lineal(Menor, Mayor, Numero_elementos, Rejilla) :-
 sum([N|_],_) :- N<0, print('ERROR 5.1. Negativos'), !, fail.
 sum([],0) :- !.
 sum([A|L],Norma) :- sum(L,Sum), Norma is Sum+A.
+
 dividir([A|[]],N,[B|[]]) :- B is A/N, !.
 dividir([A|L],N,[B|Resultado]) :- dividir(L,N,Resultado), B is A/N.
 normalizar(Distribucion_sin_normalizar, Distribucion) :- sum(Distribucion_sin_normalizar, Norma),
@@ -135,17 +132,16 @@ dividir(Distribucion_sin_normalizar, Norma, Distribucion). /* ¿Hace falta acaba
 *		KL: Numero de valor real. Divergencia KL.
 *
 ****************/
-distribucion(L) :- sum(L,1.0), print(L).
+distribucion(L) :- sum(L,1.0).
 calculo_kl([],[_|_],_) :- print('ERROR 6.3. Listas de distinto tamaño'), !, fail.
 calculo_kl([_|_],[],_) :- print('ERROR 6.3. Listas de distinto tamaño'), !, fail.
 calculo_kl([], [], 0.0).
 calculo_kl([0.0|_], [_|_], _) :- print('ERROR 6.1. Divergencia KL no definida.'), !, fail.
 calculo_kl([_|_], [0.0|_], _) :- print('ERROR 6.1. Divergencia KL no definida.'), !, fail.
 calculo_kl([X|LX], [Y|LY], KL) :- calculo_kl(LX, LY, K), KL is K+(X*log(X/Y)).
-divergencia_kl(LX, LY, KL) :- calculo_kl(LX, LY, KL), distribucion(LX), distribucion(LY). /* ¿Hace falta acabar con una exclamacion? */
-/***************************************************************************
-Falta añadir el control de errores de si no es una distribucion
-***************************************************************************/
+divergencia_kl(LX, _, _) :- normalizar(LX,DNX), LX \== DNX, print('ERROR 6.2. Divergencia KL definida solo para distribuciones'), !, fail.
+divergencia_kl(_, LY, _) :- normalizar(LY,DNY), LY \== DNY, print('ERROR 6.2. Divergencia KL definida solo para distribuciones'), !, fail.
+divergencia_kl(LX, LY, KL) :- calculo_kl(LX, LY, KL).
 
 /***************
 * EJERCICIO 8. producto_kronecker/3
@@ -157,7 +153,20 @@ Falta añadir el control de errores de si no es una distribucion
 *		Matriz_bloques: Matriz de bloques (matriz de matrices) de numeros reales.
 *
 ****************/
-producto_kronecker(Matriz_A, Matriz_B, Matriz_bloques) :- print('Error. Este ejercicio no esta implementado todavia.'), !, fail.
+% Calcula el producto de un número fila de la matriz
+producto_fila([X],Y, [S]) :- S is X*Y, S<0, print('ERROR 8.1. Elemento menor que cero.'), !, fail.
+producto_fila([X],Y, [S]) :- S is X*Y, !.
+producto_fila([A|L],Y, [B|R]) :- producto_fila(L,Y,R), B is A*Y.
+
+% Calcula el producto de un número por una matriz
+producto_matriz([X],Y, [S]) :- producto_fila(X,Y,S), !.
+producto_matriz([A|L],Y, [B|R]) :- producto_matriz(L,Y,R), producto_fila(A,Y,B).
+
+%producto_kronecker([[3,4]], [[0,5], [6,7]], R).
+producto_kronecker([[X]],Y, [S]) :- producto_matriz(Y,X,S), !.
+producto_kronecker([[A|L]],Y, [B|R]) :- producto_kronecker([L],Y,R), producto_matriz(Y,A,B), !.
+producto_kronecker([A|L],Y, [B|[R]]) :- 
+    producto_kronecker(L,Y,R), producto_kronecker([A],Y,B), !.
 
 /***************
 * EJERCICIO 9a. distancia_euclidea/3
@@ -169,7 +178,9 @@ producto_kronecker(Matriz_A, Matriz_B, Matriz_bloques) :- print('Error. Este eje
 *               D: Numero de valor real. Distancia euclidea.
 *
 ****************/
-distancia_euclidea(X1, X2, D) :- print('Error. Este ejercicio no esta implementado todavia.'), !, fail.
+distancia_euclidea(X1, X2, D) :- suma_cuadratica(X1, X2, Res), D is sqrt(Res), !.
+suma_cuadratica([], [], 0).
+suma_cuadratica([X1|L1], [X2|L2], D) :- suma_cuadratica(L1, L2, Res), D is Res + (X1-X2)**2.
 
 /***************
 * EJERCICIO 9b. calcular_distancias/3
@@ -181,7 +192,12 @@ distancia_euclidea(X1, X2, D) :- print('Error. Este ejercicio no esta implementa
 *               Matriz_resultados: Matriz de numeros de valor real donde cada fila es un vector con la distancia de un punto de test al conjunto de entrenamiento X_entrenamiento.
 *
 ****************/
-calcular_distancias(X_entrenamiento, X_test, Matriz_resultados) :- print('Error. Este ejercicio no esta implementado todavia.'), !, fail.
+distanciasFila([Punto|M_entrenamiento], X_test, [Res|Fila_Resultados]) :- 
+   distanciasFila(M_entrenamiento, X_test, Fila_Resultados), distancia_euclidea(Punto,X_test,Res).
+calcular_distancias(M_entrenamiento, [X_test|M_test], [Fila_Resultados|Matriz_resultados]) :- 
+   calcular_distancias(M_entrenamiento, M_test, Matriz_resultados), 
+   distanciasFila(M_entrenamiento, X_test, Fila_Resultados), !.
+
 
 /***************
 * EJERCICIO 9c. predecir_etiquetas/4
