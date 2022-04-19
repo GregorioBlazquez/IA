@@ -192,12 +192,13 @@ suma_cuadratica([X1|L1], [X2|L2], D) :- suma_cuadratica(L1, L2, Res), D is Res +
 *               Matriz_resultados: Matriz de numeros de valor real donde cada fila es un vector con la distancia de un punto de test al conjunto de entrenamiento X_entrenamiento.
 *
 ****************/
+distanciasFila([],_,[]).
 distanciasFila([Punto|M_entrenamiento], X_test, [Res|Fila_Resultados]) :- 
    distanciasFila(M_entrenamiento, X_test, Fila_Resultados), distancia_euclidea(Punto,X_test,Res).
+calcular_distancias(_,[],[]).
 calcular_distancias(M_entrenamiento, [X_test|M_test], [Fila_Resultados|Matriz_resultados]) :- 
    calcular_distancias(M_entrenamiento, M_test, Matriz_resultados), 
    distanciasFila(M_entrenamiento, X_test, Fila_Resultados), !.
-
 
 /***************
 * EJERCICIO 9c. predecir_etiquetas/4
