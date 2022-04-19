@@ -334,30 +334,33 @@ k_vecinos_proximos(X_entrenamiento, Y_entrenamiento, K, X_test, Y_test) :-
 *		tasa_aciertos: Tasa de acierto promediada sobre las iteraciones leave-one-out
 *
 ****************/
+
 clasifica_patrones(Patrones,Etiquetas,K,Tasa_aciertos) :- 
-   csv_read_file(Patrones, Rows1), csv_read_file(Etiquetas, Rows2),
-   leave_one_out(Rows1, Rows2, K, Tasa_aciertos), !.
+   obtener_datos(Patrones, MX),
+   obtener_datos(Etiquetas, [LY]),
+   length(MX,N),
+   leave_one_out(MX, LY, K, MX, 0, N, Aciertos),
+   Tasa_aciertos is Aciertos/N, !.
 
-leave_one_out(Rows1, Rows2, K, Tasa_aciertos) :- 
-   iterar(length(Rows1), Rows1, Rows2, K, Tasa_aciertos).
+leave_one_out(_, _, _, [],N,N,0) :- !.
+leave_one_out(MX, LY, K, [_|Res],I,N,Aciertos) :-
+   I1 is I+1,
+   leave_one_out(MX, LY, K, Res, I1, N, A_sum),
+   nth0(I,MX, X_test, X_train),
+   nth0(I, LY, Y_ext, Y_train),
+   k_vecinos_proximos(X_train, Y_train, K, [X_test],[Y_test]),
+   tasa_acierto(Y_ext, Y_test, Tasa_acierto),
+   Aciertos is A_sum+Tasa_acierto.
 
-iterar(0, _, _, _, 0.0).
-iterar(N, Rows1, Rows2, K, Tasa_aciertos+Tasa_acierto/length(Rows1)) :- 
-   N1 is N-1, iterar(N1, Rows1, Rows2, K, Tasa_aciertos), 
-   tasa_acierto(N1, Rows1, Rows2, K, Tasa_acierto).
+tasa_acierto(A, B, 1) :- A==B.
+tasa_acierto(_, _, 0).
 
-tasa_acierto(N, Rows1, Rows2, K, 0.0) :- 
-   remove_at(X, Rows1, N, K_vecinos), remove_at(Real, Rows2, N, K_etiquetas),
-   k_vecinos_proximos(K_vecinos, K_etiquetas, K, X, Prediccion), Prediccion\=Real.
-tasa_acierto(N, Rows1, Rows2, K, 1.0) :- 
-   remove_at(X, Rows1, N, K_vecinos), remove_at(Real, Rows2, N, K_etiquetas),
-   k_vecinos_proximos(K_vecinos, K_etiquetas, K, X, Prediccion), Prediccion=Real.
+rows_to_lists(Rows, Lists):-
+   maplist(row_to_list, Rows, Lists).
 
+row_to_list(Row, List):- Row =.. [row|List].
 
-% The first element in the list is number 1.
-% remove_at(X,L,K,R) :- X is the K'th element of the list L; R is the
-%    list that remains when the K'th element is removed from L.
-%    (element,list,integer,list) (?,?,+,?)
-remove_at(X,[X|Xs],1,Xs).
-remove_at(X,[Y|Xs],K,[Y|Ys]) :- K > 1, 
-   K1 is K - 1, remove_at(X,Xs,K1,Ys).
+obtener_datos(File, Lists):-
+   csv_read_file(File, Rows, [functor(row)]),
+   rows_to_lists(Rows, Lists).
+

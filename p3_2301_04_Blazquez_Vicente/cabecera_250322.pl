@@ -33,9 +33,9 @@ slice([_|Xs],I,K,Ys) :- I > 1,
 *		Resultado: Numero de valor real resultado de la operacion sum_pot_prod. 
 *
 ****************/
-sum_pot_prod(_, _, Potencia, _) :- Potencia<0, print('ERROR 1.1 Potencia.'), !, fail.
-sum_pot_prod([], _, _, _) :- print('ERROR 1.2 Longitud.'), !, fail.
-sum_pot_prod(_, [], _, _) :- print('ERROR 1.2 Longitud.'), !, fail.
+sum_pot_prod(_, _, Potencia, _) :- Potencia<0, write_log('ERROR 1.1 Potencia.'), !, fail.
+sum_pot_prod([], _, _, _) :- write_log('ERROR 1.2 Longitud.'), !, fail.
+sum_pot_prod(_, [], _, _) :- write_log('ERROR 1.2 Longitud.'), !, fail.
 sum_pot_prod([A|[]], [B|[]], Potencia, Resultado) :- Resultado is (A*B)^Potencia, !.
 sum_pot_prod([A|LA],[B|LB], Potencia, Resultado2) :- sum_pot_prod(LA, LB, Potencia, Resultado), Resultado2 is Resultado+(A*B)^Potencia.
 
@@ -52,8 +52,8 @@ sum_pot_prod([A|LA],[B|LB], Potencia, Resultado2) :- sum_pot_prod(LA, LB, Potenc
 ****************/
 penultimo([B,_|[]],B) :- !.
 penultimo([_|L],X) :- penultimo(L,X).
-segundo_penultimo([], _, _) :- print('ERROR 2.1 Longitud.'), !, fail.
-segundo_penultimo([_], _, _) :- print('ERROR 2.1 Longitud.'), !, fail.
+segundo_penultimo([], _, _) :- write_log('ERROR 2.1 Longitud.'), !, fail.
+segundo_penultimo([_], _, _) :- write_log('ERROR 2.1 Longitud.'), !, fail.
 segundo_penultimo([A,B], X, Y) :- X is B, Y is A, !.
 segundo_penultimo([_,A,_], X, Y) :- X is A, Y is A, !.
 segundo_penultimo([_,A|L],X,Y) :- penultimo(L,Y), X is A, !.
@@ -75,15 +75,15 @@ my_length([],0).
 my_length([_|L],N) :- my_length(L,N1), N is N1 + 1.
 
 sliceList([X|_],1,1,[X]) :- !.
-sliceList(_, Menor, Mayor,  _) :- Menor>Mayor, print('ERROR 3.2 Indices.'), !, fail.
-sliceList(L, N, Mayor, _) :- N<Mayor, my_length(L,N), print('ERROR 3.3 Longitud de lista.'), !, fail.
+sliceList(_, Menor, Mayor,  _) :- Menor>Mayor, write_log('ERROR 3.2 Indices.'), !, fail.
+sliceList(L, N, Mayor, _) :- N<Mayor, my_length(L,N), write_log('ERROR 3.3 Longitud de lista.'), !, fail.
 
 sliceList([X|L], 1, Mayor, [X|Sublista]) :- Mayor>1, Mayor1 is Mayor-1,
    sliceList(L, 1, Mayor1, Sublista).
 sliceList([_|L], Menor, Mayor, Sublista) :- Menor>1, 
 	Menor1 is Menor-1, Mayor1 is Mayor-1, sliceList(L, Menor1, Mayor1, Sublista).
 
-contiene([],_) :- print('ERROR 3.1 Elemento.'), !, fail.
+contiene([],_) :- write_log('ERROR 3.1 Elemento.'), !, fail.
 contiene([X|_],Y) :-  Y=X, !.
 contiene([_|L],Y) :- contiene(L, Y).
 
@@ -105,7 +105,7 @@ numElm(Menor, Mayor, Numero_elementos, Incremento) :-
 rejilla(Menor, 1, _, [Menor]) :- !.
 rejilla(Menor, Numero_elementos, Incremento, [Menor|Rejilla]) :-
    Numero_elementos1 is Numero_elementos-1, Menor1 is Menor+Incremento, rejilla(Menor1, Numero_elementos1, Incremento, Rejilla).
-espacio_lineal(Menor, Mayor, _, _) :- Menor>Mayor, print('ERROR 4.1 Indices.'), !, fail.
+espacio_lineal(Menor, Mayor, _, _) :- Menor>Mayor, write_log('ERROR 4.1 Indices.'), !, fail.
 espacio_lineal(Menor, Mayor, Numero_elementos, Rejilla) :- 
    numElm(Menor, Mayor, Numero_elementos, Incremento),
    rejilla(Menor, Numero_elementos, Incremento, Rejilla).
@@ -119,7 +119,7 @@ espacio_lineal(Menor, Mayor, Numero_elementos, Rejilla) :-
 *		Distribucion: Vector de numeros reales de salida. Distribucion normalizada.
 *
 ****************/
-sum([N|_],_) :- N<0, print('ERROR 5.1. Negativos.'), !, fail.
+sum([N|_],_) :- N<0, write_log('ERROR 5.1. Negativos.'), !, fail.
 sum([],0) :- !.
 sum([A|L],Norma) :- sum(L,Sum), Norma is Sum+A.
 
@@ -139,14 +139,14 @@ dividir(Distribucion_sin_normalizar, Norma, Distribucion). /* ¿Hace falta acaba
 *
 ****************/
 distribucion(L) :- sum(L,1.0).
-calculo_kl([],[_|_],_) :- print('ERROR 6.3. Listas de distinto tamaño.'), !, fail.
-calculo_kl([_|_],[],_) :- print('ERROR 6.3. Listas de distinto tamaño.'), !, fail.
+calculo_kl([],[_|_],_) :- write_log('ERROR 6.3. Listas de distinto tamaño.'), !, fail.
+calculo_kl([_|_],[],_) :- write_log('ERROR 6.3. Listas de distinto tamaño.'), !, fail.
 calculo_kl([], [], 0.0).
-calculo_kl([0.0|_], [_|_], _) :- print('ERROR 6.1. Divergencia KL no definida.'), !, fail.
-calculo_kl([_|_], [0.0|_], _) :- print('ERROR 6.1. Divergencia KL no definida.'), !, fail.
+calculo_kl([0.0|_], [_|_], _) :- write_log('ERROR 6.1. Divergencia KL no definida.'), !, fail.
+calculo_kl([_|_], [0.0|_], _) :- write_log('ERROR 6.1. Divergencia KL no definida.'), !, fail.
 calculo_kl([X|LX], [Y|LY], KL) :- calculo_kl(LX, LY, K), KL is K+(X*log(X/Y)).
-divergencia_kl(LX, _, _) :- normalizar(LX,DNX), LX \== DNX, print('ERROR 6.2. Divergencia KL definida solo para distribuciones.'), !, fail.
-divergencia_kl(_, LY, _) :- normalizar(LY,DNY), LY \== DNY, print('ERROR 6.2. Divergencia KL definida solo para distribuciones.'), !, fail.
+divergencia_kl(LX, _, _) :- normalizar(LX,DNX), LX \== DNX, write_log('ERROR 6.2. Divergencia KL definida solo para distribuciones.'), !, fail.
+divergencia_kl(_, LY, _) :- normalizar(LY,DNY), LY \== DNY, write_log('ERROR 6.2. Divergencia KL definida solo para distribuciones.'), !, fail.
 divergencia_kl(LX, LY, KL) :- calculo_kl(LX, LY, KL).
 
 /***************
@@ -160,7 +160,7 @@ divergencia_kl(LX, LY, KL) :- calculo_kl(LX, LY, KL).
 *
 ****************/
 % Calcula el producto de un número fila de la matriz
-producto_fila([X],Y, [S]) :- S is X*Y, S<0, print('ERROR 7.1. Elemento menor que cero.'), !, fail.
+producto_fila([X],Y, [S]) :- S is X*Y, S<0, write_log('ERROR 7.1. Elemento menor que cero.'), !, fail.
 producto_fila([X],Y, [S]) :- S is X*Y, !.
 producto_fila([A|L],Y, [B|R]) :- producto_fila(L,Y,R), B is A*Y.
 
@@ -334,30 +334,33 @@ k_vecinos_proximos(X_entrenamiento, Y_entrenamiento, K, X_test, Y_test) :-
 *		tasa_aciertos: Tasa de acierto promediada sobre las iteraciones leave-one-out
 *
 ****************/
+
 clasifica_patrones(Patrones,Etiquetas,K,Tasa_aciertos) :- 
-   csv_read_file(Patrones, Rows1), csv_read_file(Etiquetas, Rows2),
-   leave_one_out(Rows1, Rows2, K, Tasa_aciertos), !.
+   obtener_datos(Patrones, MX),
+   obtener_datos(Etiquetas, [LY]),
+   length(MX,N),
+   leave_one_out(MX, LY, K, MX, 0, N, Aciertos),
+   Tasa_aciertos is Aciertos/N, !.
 
-leave_one_out(Rows1, Rows2, K, Tasa_aciertos) :- 
-   iterar(length(Rows1), Rows1, Rows2, K, Tasa_aciertos).
+leave_one_out(_, _, _, [],N,N,0) :- !.
+leave_one_out(MX, LY, K, [_|Res],I,N,Aciertos) :-
+   I1 is I+1,
+   leave_one_out(MX, LY, K, Res, I1, N, A_sum),
+   nth0(I,MX, X_test, X_train),
+   nth0(I, LY, Y_ext, Y_train),
+   k_vecinos_proximos(X_train, Y_train, K, [X_test],[Y_test]),
+   tasa_acierto(Y_ext, Y_test, Tasa_acierto),
+   Aciertos is A_sum+Tasa_acierto.
 
-iterar(0, _, _, _, 0.0).
-iterar(N, Rows1, Rows2, K, Tasa_aciertos+Tasa_acierto/length(Rows1)) :- 
-   N1 is N-1, iterar(N1, Rows1, Rows2, K, Tasa_aciertos), 
-   tasa_acierto(N1, Rows1, Rows2, K, Tasa_acierto).
+tasa_acierto(A, B, 1) :- A==B.
+tasa_acierto(_, _, 0).
 
-tasa_acierto(N, Rows1, Rows2, K, 0.0) :- 
-   remove_at(X, Rows1, N, K_vecinos), remove_at(Real, Rows2, N, K_etiquetas),
-   k_vecinos_proximos(K_vecinos, K_etiquetas, K, X, Prediccion), Prediccion\=Real.
-tasa_acierto(N, Rows1, Rows2, K, 1.0) :- 
-   remove_at(X, Rows1, N, K_vecinos), remove_at(Real, Rows2, N, K_etiquetas),
-   k_vecinos_proximos(K_vecinos, K_etiquetas, K, X, Prediccion), Prediccion=Real.
+rows_to_lists(Rows, Lists):-
+   maplist(row_to_list, Rows, Lists).
 
+row_to_list(Row, List):- Row =.. [row|List].
 
-% The first element in the list is number 1.
-% remove_at(X,L,K,R) :- X is the K'th element of the list L; R is the
-%    list that remains when the K'th element is removed from L.
-%    (element,list,integer,list) (?,?,+,?)
-remove_at(X,[X|Xs],1,Xs).
-remove_at(X,[Y|Xs],K,[Y|Ys]) :- K > 1, 
-   K1 is K - 1, remove_at(X,Xs,K1,Ys).
+obtener_datos(File, Lists):-
+   csv_read_file(File, Rows, [functor(row)]),
+   rows_to_lists(Rows, Lists).
+
