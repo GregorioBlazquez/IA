@@ -364,3 +364,48 @@ obtener_datos(File, Lists):-
    csv_read_file(File, Rows, [functor(row)]),
    rows_to_lists(Rows, Lists).
 
+
+/***************
+* EJERCICIO 10. fractal/1
+*
+*       ENTRADA:
+*		Depth: profundidad de exploracion del fractal
+*       SALIDA:
+*		Imagen del fractal dada la profundidad Depth
+*
+****************/
+
+fractal(Depth) :-
+	new(D, window('Fractal')),
+	send(D, size, size(800, 600)),
+	drawFractal(D, 100, 450, 700, 450, 0, Depth),
+	send(D, open), !.
+	
+
+drawFractal(D, Xs, Ys, Xt, Yt, _Angle, 0):-
+	new(Line, line(Xs, Ys, Xt, Yt, none)),
+	send(D, display, Line).
+
+drawFractal(D, Xs, Ys, Xt, Yt, Angle, Depth) :-
+
+	A1 is Angle-60,
+	A2 is Angle+60,
+	De is Depth-1,
+	dist(Xs, Ys, Xt, Yt, Dis),
+	L is Dis/3.0,
+	
+	X1 is Xs + L * cos(Angle * pi / 180.0),
+	X2 is X1 + L * cos(A1 * pi / 180.0),
+	X3 is X2 + L * cos(A2 * pi / 180.0),
+	
+	Y1 is Ys + L * sin(Angle * pi / 180.0),
+	Y2 is Y1 + L * sin(A1 * pi / 180.0),
+	Y3 is Y2 + L * sin(A2 * pi / 180.0),
+	
+	
+	drawFractal(D, Xs, Ys, X1, Y1, Angle, De),
+	drawFractal(D, X1, Y1, X2, Y2, A1, De),
+	drawFractal(D, X2, Y2, X3, Y3, A2, De),
+	drawFractal(D, X3, Y3, Xt, Yt, Angle, De).
+	
+dist(X1, Y1, X2, Y2, D) :- D is sqrt((X1 - X2)**2 + (Y1-Y2)**2), !.
